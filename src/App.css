@@ -1,0 +1,125 @@
+:root {
+  --bg: #0F0F0F;
+  --surface: #1A1A1A;
+  --card: #1E1E1E;
+  --border: #2A2A2A;
+  --borderLight: #333333;
+  --text: #E8E4DE;
+  --textMuted: #8A8580;
+  --textDim: #5A5550;
+  --accent: #C9A87C;
+  --accentDim: rgba(201, 168, 124, 0.15);
+  --danger: #C87C7C;
+  --dangerDim: rgba(200, 124, 124, 0.15);
+  --success: #7CC87C;
+  --successDim: rgba(124, 200, 124, 0.15);
+  --blue: #7C9CC8;
+  --blueDim: rgba(124, 156, 200, 0.15);
+  --amber: #E8B97C;
+  --amberDim: rgba(232, 185, 124, 0.15);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Source Sans 3', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent) !important;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+::placeholder {
+  color: var(--textDim);
+  opacity: 1;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--borderLight);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+}
