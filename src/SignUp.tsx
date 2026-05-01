@@ -1,49 +1,86 @@
 import { useForm } from 'react-hook-form';
-import type { SignUpData } from './types';
+import { useState } from 'react';
+import type { SignUpData, Page } from './types';
+import './Auth.css';
 
-export default function SignUp() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<SignUpData>();
+interface Props {
+  onNavigate: (page: Page) => void;
+}
 
-    const onSubmit = (data: SignUpData) => {
-        if (localStorage.getItem(data.email)) {
-            console.log("User with this email already exists");
-            return;
-        }
-        localStorage.setItem(data.email, JSON.stringify({ name: data.name, password: data.password }));
-        console.log("Registered successfully: " + data.name);
-    };
+export default function SignUp({ onNavigate }: Props) {
+  const [serverError, setServerError] = useState('');
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpData>();
 
-    return (
-        <>
-            <h2>Sign up form</h2>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <input
-                    type="text"
-                    {...register("name", { required: true })}
-                    placeholder="Your name"
-                />
-                {errors.name && <span style={{ color: "red" }}>*Name* is mandatory</span>}
 
-                <input
-                    type="email"
-                    {...register("email", { required: true })}
-                    placeholder="email@example.com"
-                />
-                {errors.email && <span style={{ color: "red" }}>*Email* is mandatory</span>}
+  //using local storage for testing 
+  const onSubmit = (data: SignUpData) => {
+    setServerError('');
+    if (localStorage.getItem(data.email)) {
+      setServerError('An account with this email already exists.');
+      return;
+    }
+    localStorage.setItem(data.email, JSON.stringify({ name: data.name, password: data.password }));
+    onNavigate('login');
+  };
 
-                <input
-                    type="password"
-                    {...register("password", { required: true })}
-                    placeholder="Password"
-                />
-                {errors.password && <span style={{ color: "red" }}>*Password* is mandatory</span>}
+  return (
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <svg className="auth-brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+          </svg>
+          <span className="auth-brand-name">Notes Cloud</span>
+        </div>
 
-                <input type="submit" value="Sign up" />
-            </form>
-        </>
-    );
+        <h1 className="auth-title">Create an account</h1>
+        <p className="auth-subtitle">Start organising your notes</p>
+
+        {serverError && <div className="auth-error-banner">{serverError}</div>}
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="auth-field">
+            <label className="auth-label">Name</label>
+            <input
+              className="auth-input"
+              type="text"
+              placeholder="Your name"
+              {...register('name', { required: true })}
+            />
+            {errors.name && <span className="auth-error">Name is required.</span>}
+          </div>
+
+          <div className="auth-field">
+            <label className="auth-label">Email</label>
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="email@example.com"
+              {...register('email', { required: true })}
+            />
+            {errors.email && <span className="auth-error">Email is required.</span>}
+          </div>
+
+          <div className="auth-field">
+            <label className="auth-label">Password</label>
+            <input
+              className="auth-input"
+              type="password"
+              placeholder="••••••••"
+              {...register('password', { required: true, minLength: 6 })}
+            />
+            {errors.password?.type === 'required' && <span className="auth-error">Password is required.</span>}
+            {errors.password?.type === 'minLength' && <span className="auth-error">Password must be at least 6 characters.</span>}
+          </div>
+
+          <button className="auth-btn" type="submit">Create account</button>
+        </form>
+
+        <p className="auth-footer">
+          Already have an account?{' '}
+          <button className="auth-link" onClick={() => onNavigate('login')}>Log in</button>
+        </p>
+      </div>
+    </div>
+  );
 }

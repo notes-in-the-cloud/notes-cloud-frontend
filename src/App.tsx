@@ -1,13 +1,20 @@
-import LogIn from "./LogIn";
-import SignUp from "./SignUp";
+import { useState } from 'react';
+import './App.css';
+import LogIn from './LogIn';
+import SignUp from './SignUp';
+import Notes from './Notes';
+import type { Page } from './types';
 
-function App(){
-  return(
+function App() {
+  const [page, setPage] = useState<Page>('login');
+
+  return (
     <>
-      <LogIn/>
-      <SignUp/>
+      {page === 'login' && <LogIn onNavigate={setPage} />}
+      {page === 'register' && <SignUp onNavigate={setPage} />}
+      {page==='notes'&& <Notes onNavigate={setPage}/>}
     </>
-  )
+  );
 }
 
 export default App;
