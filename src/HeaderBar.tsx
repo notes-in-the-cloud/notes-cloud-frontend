@@ -7,9 +7,11 @@ interface Props{
     userAvatar?:string;
     notifCount?:number;
     onLogOut: () => void;
+    onNotifications?: () => void;
+    onReminders?: () => void;
 }
 
-export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLogOut}:Props){
+export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLogOut,onNotifications,onReminders}:Props){
     return (
         <header className="notes-header">
             <div className="notes-header-icon">
@@ -28,7 +30,14 @@ export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLog
             </div>
 
             <div className="notes-header-action">
-                <button className="notes-header-icon-btn" aria-label="Notifications">
+                <button className="notes-header-icon-btn" aria-label="Reminders" onClick={onReminders}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </button>
+
+                <button className="notes-header-icon-btn" aria-label="Notifications" onClick={onNotifications}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
