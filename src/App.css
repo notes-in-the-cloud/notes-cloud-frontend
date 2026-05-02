@@ -19,6 +19,22 @@
   --amberDim: rgba(232, 185, 124, 0.15);
 }
 
+[data-theme="light"] {
+  --bg: #f5f4f1;
+  --surface: #ffffff;
+  --card: #ebebeb;
+  --border: #dddbd6;
+  --borderLight: #c8c5bf;
+  --text: #1a1917;
+  --textMuted: #6b6760;
+  --textDim: #3a3834;
+  --accentDim: rgba(221, 142, 39, 0.12);
+  --errorDim: rgba(200, 80, 80, 0.12);
+  --successDim: rgba(80, 160, 80, 0.12);
+  --blueDim: rgba(80, 120, 180, 0.12);
+  --amberDim: rgba(200, 150, 80, 0.12);
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

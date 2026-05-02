@@ -4,7 +4,13 @@ import RemindersPage from './Reminders';
 import NotificationsPanel from './Notifications';
 import type { Page } from '../types';
 
-export default function Notes({ onNavigate }: { onNavigate: (page: Page) => void }) {
+interface Props {
+  onNavigate: (page: Page) => void;
+  darkMode: boolean;
+  onToggleTheme: () => void;
+}
+
+export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const [showReminders, setShowReminders] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -14,6 +20,8 @@ export default function Notes({ onNavigate }: { onNavigate: (page: Page) => void
         onLogOut={() => onNavigate('login')}
         onReminders={() => setShowReminders(true)}
         onNotifications={() => setShowNotifications(prev => !prev)}
+        darkMode={darkMode}
+        onToggleTheme={onToggleTheme}
       />
 
       {showReminders ? (
