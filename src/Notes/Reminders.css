@@ -77,19 +77,104 @@
 }
 
 .panel-empty--error {
-  color: #e05252;
+  color: var(--error);
 }
 
-/* Reminder items */
 .reminder-item {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 0.6rem;
   padding: 0.75rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .reminder-item--done {
   opacity: 0.5;
+}
+
+.reminder-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reminder-item-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.reminder-item:hover .reminder-item-actions {
+  opacity: 1;
+}
+
+.reminder-item-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--textMuted);
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.reminder-item-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+  opacity: 1;
+}
+
+.reminder-item-btn--delete:hover {
+  color: var(--error);
+}
+
+.reminder-item-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.reminder-checkbox {
+  flex-shrink: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-top: 0.2rem;
+  color: transparent;
+}
+
+.reminder-checkbox:hover {
+  border-color: var(--success);
+  opacity: 1;
+}
+
+.reminder-checkbox--checked {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--textDim);
+}
+
+.reminder-checkbox--checked:hover {
+  opacity: 0.8;
+  border-color: var(--success);
+}
+
+.reminder-checkbox:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .reminder-item-title {
@@ -110,7 +195,6 @@
   margin-top: 0.3rem;
 }
 
-/* Add reminder button row */
 .panel-add-row {
   padding: 0.75rem 1.25rem;
   border-bottom: 1px solid var(--border);
@@ -138,7 +222,6 @@
   color: var(--accent);
 }
 
-/* Add reminder form */
 .reminder-form {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--border);
@@ -209,7 +292,7 @@
 
 .reminder-form-error {
   font-size: 0.8rem;
-  color: #e05252;
+  color: var(--error);
   margin: 0;
 }
 
@@ -240,7 +323,7 @@
 
 .reminder-form-btn--submit {
   background: var(--accent);
-  color: #fff;
+  color: var(--textDim);
   border-color: var(--accent);
 }
 
@@ -253,7 +336,6 @@
   cursor: not-allowed;
 }
 
-/* Reminder item priority badge */
 .reminder-item-priority {
   font-size: 0.7rem;
   font-weight: 600;
@@ -263,7 +345,115 @@
   margin-bottom: 0.15rem;
 }
 
-/* Notification items */
+.reminders-page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2.5rem 3rem;
+}
+
+.reminders-page-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.reminders-page-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reminders-back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--textMuted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.4rem;
+}
+
+.reminders-back-btn:hover {
+  background: var(--card);
+  color: var(--text);
+}
+
+.reminders-page-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.reminders-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.reminders-new-btn:hover {
+  opacity: 0.88;
+}
+
+.reminders-page-subtitle {
+  font-size: 0.9rem;
+  color: var(--textMuted);
+  margin-bottom: 1.25rem;
+}
+
+.reminders-overdue-count {
+  color: var(--error);
+}
+
+.reminders-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.reminders-tab {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.35rem 1.1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--textMuted);
+  font-family: inherit;
+}
+
+.reminders-tab--active {
+  background: var(--accentDim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reminder-form--page {
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--card);
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
 .notif-item {
   background: var(--card);
   border: 1px solid var(--border);
