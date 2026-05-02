@@ -1,5 +1,5 @@
-import Avatar from "./Avatar"
-import LogOut from "./LogOut";
+import Avatar from "../Avatar"
+import LogOut from "../Auth/LogOut";
 import './HeaderBar.css';
 
 interface Props{

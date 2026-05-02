@@ -1,25 +1,27 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import type { LoginData, Page } from './types';
+import type { SignUpData, Page } from '../types';
 import './Auth.css';
 
 interface Props {
   onNavigate: (page: Page) => void;
 }
 
-export default function LogIn({ onNavigate }: Props) {
+export default function SignUp({ onNavigate }: Props) {
   const [serverError, setServerError] = useState('');
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpData>();
 
-  const onSubmit = (data: LoginData) => {
+
+  //using local storage for testing 
+  const onSubmit = (data: SignUpData) => {
     setServerError('');
-    const raw = localStorage.getItem(data.email);
-    const userData = raw ? JSON.parse(raw) : null;
-    if (!userData || userData.password !== data.password) {
-      setServerError('Email or password is incorrect.');
+    if (localStorage.getItem(data.email)) {
+      setServerError('An account with this email already exists.');
       return;
     }
-    console.log('Logged in as:', userData.name);
+    const userId = crypto.randomUUID();
+    localStorage.setItem(data.email, JSON.stringify({ name: data.name, password: data.password, userId }));
+    onNavigate('login');
   };
 
   return (
@@ -32,12 +34,23 @@ export default function LogIn({ onNavigate }: Props) {
           <span className="auth-brand-name">Notes Cloud</span>
         </div>
 
-        <h1 className="auth-title">Welcome back</h1>
-        <p className="auth-subtitle">Log in to your account</p>
+        <h1 className="auth-title">Create an account</h1>
+        <p className="auth-subtitle">Start organising your notes</p>
 
         {serverError && <div className="auth-error-banner">{serverError}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="auth-field">
+            <label className="auth-label">Name</label>
+            <input
+              className="auth-input"
+              type="text"
+              placeholder="Your name"
+              {...register('name', { required: true })}
+            />
+            {errors.name && <span className="auth-error">Name is required.</span>}
+          </div>
+
           <div className="auth-field">
             <label className="auth-label">Email</label>
             <input
@@ -55,17 +68,18 @@ export default function LogIn({ onNavigate }: Props) {
               className="auth-input"
               type="password"
               placeholder="••••••••"
-              {...register('password', { required: true })}
+              {...register('password', { required: true, minLength: 6 })}
             />
-            {errors.password && <span className="auth-error">Password is required.</span>}
+            {errors.password?.type === 'required' && <span className="auth-error">Password is required.</span>}
+            {errors.password?.type === 'minLength' && <span className="auth-error">Password must be at least 6 characters.</span>}
           </div>
 
-          <button className="auth-btn" type="submit" onClick={()=>onNavigate('notes')}>Log in</button>
+          <button className="auth-btn" type="submit">Create account</button>
         </form>
 
         <p className="auth-footer">
-          Don't have an account?{' '}
-          <button className="auth-link" onClick={() => onNavigate('register')}>Sign up</button>
+          Already have an account?{' '}
+          <button className="auth-link" onClick={() => onNavigate('login')}>Log in</button>
         </p>
       </div>
     </div>

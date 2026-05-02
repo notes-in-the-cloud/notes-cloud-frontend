@@ -1,4 +1,4 @@
-export type Page = "login" | "register" | "notes" | "detail" | "create" | "public" | "reminders";
+export type Page = "login" | "register" | "notes" | "detail" | "create" | "public";
 export type AlertSource = "auto" | "bell" | "list";
 export type IconName =
   | "plus" | "search" | "pin" | "share" | "bell" | "edit" | "trash" | "back"
@@ -22,16 +22,23 @@ export interface Note {
   token: string;
 }
 
+export type Priority = 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type ReminderStatus = 'PENDING' | 'FIRED' | 'COMPLETED';
+
 export interface Reminder {
-  id: number;
-  title: string;
+  id: string;
+  userId: string;
+  heading: string;
   description: string;
-  datetime: string;
-  recurring: "none" | "daily" | "weekly" | "monthly";
-  channels: { app: boolean; email: boolean; push: boolean };
-  completed: boolean;
-  notified: boolean;
+  reminderDate: string;
+  reminderTime: string;
+  priority: Priority;
+  status: ReminderStatus;
+  notifyInApp: boolean;
+  notifyEmail: boolean;
+  notifyPush: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Notification {

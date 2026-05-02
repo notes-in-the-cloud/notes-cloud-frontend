@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import './App.css';
-import LogIn from './LogIn';
-import SignUp from './SignUp';
-import Notes from './Notes';
-import Reminders from './Reminders';
+import LogIn from './Auth/LogIn';
+import SignUp from './Auth/SignUp';
+import Notes from './Notes/Notes';
 import type { Page } from './types';
 
 function App() {
@@ -14,7 +13,6 @@ function App() {
       {page === 'login' && <LogIn onNavigate={setPage} />}
       {page === 'register' && <SignUp onNavigate={setPage} />}
       {page === 'notes' && <Notes onNavigate={setPage} />}
-      {page === 'reminders' && <Reminders onNavigate={setPage} />}
     </>
   );
 }
