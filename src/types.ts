@@ -42,13 +42,25 @@ export interface Reminder {
 }
 
 export interface Notification {
-  id: number;
-  type: "reminder" | "share" | "overdue" | "complete" | "view";
-  title: string;
-  subtitle: string;
-  time: string;
+  id: string;
+  userId: string;
+  reminderId: string;
+  heading: string;
+  message: string;
+  priority: Priority;
   read: boolean;
-  reminderId?: number;
+  readAt: string | null;
+  firedAt: string;
+}
+
+export interface NotificationPayload {
+  notificationId: string;
+  reminderId: string;
+  heading: string;
+  message: string;
+  priority: Priority;
+  firedAt: string;
+  type: string;
 }
 
 export interface SignUpData{

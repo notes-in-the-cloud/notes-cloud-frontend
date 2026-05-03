@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Reminder, Priority } from '../types';
-import { fetchReminders, fetchPendingReminders, fetchCompletedReminders, createReminder, updateReminder, deleteReminder } from '../api/reminders';
+import { fetchReminders, fetchPendingReminders, fetchCompletedReminders, fetchReminderById, createReminder, updateReminder, deleteReminder } from '../api/reminders';
 import './Reminders.css';
 
 // ─────────────────────────────────────────────────────────────────
@@ -316,7 +316,7 @@ function ReminderEditorModal({ existing, submitting, formError, form, setForm, o
 //   Main page
 // ─────────────────────────────────────────────────────────────────
 
-export default function RemindersPage({ onBack }: { onBack: () => void }) {
+export default function RemindersPage({ onBack, openReminderId }: { onBack: () => void; openReminderId?: string }) {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -350,6 +350,25 @@ export default function RemindersPage({ onBack }: { onBack: () => void }) {
       .catch(() => setError('Could not load reminders.'))
       .finally(() => setLoading(false));
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!openReminderId) return;
+    fetchReminderById(openReminderId).then(r => {
+      setEditingId(r.id);
+      setForm({
+        heading: r.heading,
+        description: r.description,
+        reminderDate: r.reminderDate,
+        reminderTime: r.reminderTime.slice(0, 5),
+        priority: r.priority,
+        notifyInApp: r.notifyInApp,
+        notifyEmail: r.notifyEmail,
+        notifyPush: r.notifyPush,
+      });
+      setFormError('');
+      setShowForm(true);
+    }).catch(console.error);
+  }, [openReminderId]);
 
   function openCreate() {
     setEditingId(null);
@@ -454,12 +473,12 @@ export default function RemindersPage({ onBack }: { onBack: () => void }) {
   };
 
   const filtered =
-    activeTab === 'all'        ? active   :
-    activeTab === 'upcoming'   ? upcoming :
+    activeTab === 'all'        ? enriched  :
+    activeTab === 'upcoming'   ? upcoming  :
     completed;
 
   const tabs: [FilterTab, string, number][] = [
-    ['all',       'All',       active.length],
+    ['all',       'All',       enriched.length],
     ['upcoming',  'Upcoming',  upcoming.length],
     ['completed', 'Completed', completed.length],
   ];
@@ -619,6 +638,7 @@ export default function RemindersPage({ onBack }: { onBack: () => void }) {
           {renderGroup('Tomorrow',    groups.tomorrow, 'reminder-group-bar--tomorrow')}
           {renderGroup('This week',   groups.week,     'reminder-group-bar--week')}
           {renderGroup('Later',       groups.later,    'reminder-group-bar--later')}
+          {renderGroup('Completed',   completed,       'reminder-group-bar--completed')}
         </>
       ) : !loading && !error && (
         <div className="reminders-list">

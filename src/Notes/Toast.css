@@ -1,0 +1,121 @@
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 340px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  pointer-events: all;
+  animation: toast-in 0.25s ease;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.toast-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--textMuted);
+  padding: 0;
+  line-height: 1;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  color: var(--text);
+}
+
+.toast-message {
+  font-size: 13px;
+  color: var(--textMuted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.toast-prio {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.toast-prio--urgent { background: var(--errorDim);   color: var(--error); }
+.toast-prio--high   { background: var(--amberDim);   color: var(--amber); }
+.toast-prio--medium { background: var(--accentDim);  color: var(--accent); }
+.toast-prio--low    { background: var(--successDim); color: var(--success); }
+
+.toast-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.toast-btn {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.toast-btn:hover { opacity: 0.85; }
+
+.toast-btn--complete {
+  background: var(--accent);
+  color: #fff;
+}
+
+.toast-btn--dismiss {
+  background: var(--borderLight);
+  color: var(--textMuted);
+}
+
+.toast-progress {
+  height: 3px;
+  background: var(--border);
+  margin: 0 -16px;
+}
+
+.toast-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 50ms linear;
+}

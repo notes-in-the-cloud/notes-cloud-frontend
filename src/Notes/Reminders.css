@@ -146,7 +146,8 @@
 .reminder-group-bar--today    { background: var(--accent);    }
 .reminder-group-bar--tomorrow { background: var(--success);   }
 .reminder-group-bar--week     { background: var(--blue);      }
-.reminder-group-bar--later    { background: var(--textMuted); }
+.reminder-group-bar--later     { background: var(--textMuted); }
+.reminder-group-bar--completed { background: var(--success);   }
 
 .reminder-group-title {
   font-family: 'Playfair Display', Georgia, serif;
@@ -835,3 +836,124 @@
    Reminders use this for headings. If you don't want the
    network request, drop the @import — it'll fall back to Georgia. */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap');
+
+/* ─────────────────────────────────────────────────────────────────
+     Notifications side panel
+   ───────────────────────────────────────────────────────────────── */
+
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: transparent;
+}
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  z-index: 401;
+  background: var(--card);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+  animation: panel-in 0.22s ease;
+}
+
+@keyframes panel-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.panel-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--textMuted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.panel-close-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.panel-empty {
+  color: var(--textMuted);
+  font-size: 0.88rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.notif-item {
+  padding: 0.75rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.notif-item:hover {
+  background: var(--surface);
+}
+
+.notif-item--read {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.notif-item--read:hover {
+  background: transparent;
+}
+
+.notif-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.notif-item-subtitle {
+  font-size: 0.82rem;
+  color: var(--textMuted);
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+.notif-item-time {
+  font-size: 0.75rem;
+  color: var(--textMuted);
+}
