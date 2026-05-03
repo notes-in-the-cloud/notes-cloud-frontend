@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Reminder, Priority } from '../types';
-import { fetchReminders, createReminder, updateReminder, deleteReminder } from '../api/reminders';
+import { fetchReminders, fetchPendingReminders, fetchCompletedReminders, createReminder, updateReminder, deleteReminder } from '../api/reminders';
 import './Reminders.css';
 
 // ─────────────────────────────────────────────────────────────────
@@ -339,11 +339,17 @@ export default function RemindersPage({ onBack }: { onBack: () => void }) {
   }, []);
 
   useEffect(() => {
-    fetchReminders()
+    setLoading(true);
+    setError('');
+    const fetcher =
+      activeTab === 'completed' ? fetchCompletedReminders :
+      activeTab === 'upcoming'  ? fetchPendingReminders   :
+      fetchReminders;
+    fetcher()
       .then(setReminders)
       .catch(() => setError('Could not load reminders.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [activeTab]);
 
   function openCreate() {
     setEditingId(null);
