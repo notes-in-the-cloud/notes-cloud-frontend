@@ -30,7 +30,7 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
         <main className="main-container" />
       )}
 
-      {!showReminders && showNotifications && (
+      {showNotifications && (
         <NotificationsPanel onClose={() => setShowNotifications(false)} />
       )}
     </div>
