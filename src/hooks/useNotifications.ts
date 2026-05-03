@@ -16,13 +16,11 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   const displayed = tab === 'all' ? allNotifications : unreadNotifications;
   const allCount = allNotifications.length;
 
-  // On login: fetch only the badge count
   useEffect(() => {
     if (!userId) return;
     api.fetchUnreadCount(userId).then(setUnreadCount).catch(console.error);
   }, [userId]);
 
-  // When panel opens or tab changes: fetch the right list
   useEffect(() => {
     if (!userId || !isOpen) return;
     if (tab === 'all') {
@@ -32,9 +30,9 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
     }
   }, [userId, isOpen, tab]);
 
-  // WebSocket — always active while logged in
   useEffect(() => {
-    if (!userId) return;
+    if (!userId)
+       return;
     const client = new Client({
       brokerURL: 'ws://localhost:8084/ws',
       onConnect: () => {
@@ -64,18 +62,21 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, [userId]);
 
   const markAsRead = useCallback(async (id: string) => {
-    if (!userId) return;
+    if (!userId) 
+      return;
     const updated = await api.markAsRead(userId, id);
     setAllNotifications(prev => {
       const wasUnread = prev.find(n => n.id === id)?.read === false;
-      if (wasUnread) setUnreadCount(c => Math.max(0, c - 1));
+      if (wasUnread) 
+        setUnreadCount(c => Math.max(0, c - 1));
       return prev.map(n => n.id === id ? updated : n);
     });
     setUnreadNotifications(prev => prev.filter(n => n.id !== id));
   }, [userId]);
 
   const markAllAsRead = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) 
+      return;
     await api.markAllAsRead(userId);
     const now = new Date().toISOString();
     setAllNotifications(prev => prev.map(n => ({ ...n, read: true, readAt: now })));
@@ -88,7 +89,8 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, []);
 
   const completeFromToast = useCallback(async (reminderId: string, toastId: string) => {
-    if (!userId) return;
+    if (!userId) 
+      return;
     try {
       const reminder = await fetchReminderById(reminderId);
       await updateReminder({ ...reminder, status: 'COMPLETED' });

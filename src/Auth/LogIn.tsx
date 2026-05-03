@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import type { LoginData, Page } from '../types';
+import { saveSession } from './../Auth/Session';
 import './Auth.css';
 
 interface Props {
@@ -19,8 +20,10 @@ export default function LogIn({ onNavigate }: Props) {
       setServerError('Email or password is incorrect.');
       return;
     }
-    localStorage.setItem('userId', userData.userId ?? '');
-    localStorage.setItem('userName', userData.name ?? '');
+    saveSession({
+      userId: userData.userId ?? '',
+      userName: userData.name ?? '',
+    });
     onNavigate('notes');
   };
 

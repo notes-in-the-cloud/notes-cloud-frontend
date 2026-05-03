@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import HeaderBar from './HeaderBar';
-import RemindersPage from './Reminders';
+import RemindersPage from './Reminders/Reminders';
 import NotificationsPanel from './Notifications';
 import ToastContainer from './ToastNotification';
 import { useNotifications } from '../hooks/useNotifications';
+import { loadSession } from '../Auth/Session';
 import type { Page } from '../types';
 
 interface Props {
@@ -17,7 +18,9 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [openReminderId, setOpenReminderId] = useState<string | undefined>(undefined);
 
-  const userId = localStorage.getItem('userId');
+  const session = loadSession();
+  const userId = session?.userId ?? null;
+  const userName = session?.userName;
   const {
     displayed,
     unreadCount,
@@ -44,6 +47,7 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   return (
     <div className="notes-layout">
       <HeaderBar
+        userName={userName}
         onLogOut={() => onNavigate('login')}
         onReminders={() => { setOpenReminderId(undefined); setShowReminders(true); }}
         onNotifications={() => setShowNotifications(prev => !prev)}

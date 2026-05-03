@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Avatar from "../Avatar"
+import { clearSession } from '../Auth/Session';
 import './HeaderBar.css';
 
 interface Props{
@@ -14,7 +15,17 @@ interface Props{
     onToggleTheme?: () => void;
 }
 
-export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLogOut,onNotifications,onReminders,onSettings,darkMode=true,onToggleTheme}:Props){
+export default function HeaderBar({
+    userName = "User",
+    userAvatar,
+    notifCount = 0,
+    onLogOut,
+    onNotifications,
+    onReminders,
+    onSettings,
+    darkMode = true,
+    onToggleTheme,
+}: Props) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -30,8 +41,7 @@ export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLog
     }, [menuOpen]);
 
     const handleLogOut = () => {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('userName');
+        clearSession();
         setMenuOpen(false);
         onLogOut();
     };
