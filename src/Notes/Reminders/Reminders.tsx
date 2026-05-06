@@ -55,6 +55,15 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
+useEffect(()=>{
+  function onReminderUpdated(e:Event){
+    const updated=(e as CustomEvent<Reminder>).detail;
+    setReminders(prev=>prev.map(r=>(r.id===updated.id?updated:r)));
+  }
+  window.addEventListener('reminder:updated',onReminderUpdated);
+  return ()=>window.removeEventListener('reminder:updated',onReminderUpdated);
+},[]);
+
   const openedIds = useRef(new Set<string>());
   useEffect(() => {
     if (!openReminderId || loading) return;
@@ -132,7 +141,8 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this reminder?')) return;
+    if (!confirm('Delete this reminder?')) 
+      return;
     setDeletingId(id);
     try {
       await deleteReminder(id);
@@ -145,8 +155,6 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     }
   }
 
-  // Цялото обработване (sort, group по дата) се мемоизира — пресмята се
-  // само когато reminders/now реално се сменят, а не на всеки render.
   const { active, completed, upcoming, groups } = useMemo(() => {
     const enriched: EnrichedReminder[] = reminders.map(r => ({
       ...r,
@@ -181,13 +189,13 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   }, [reminders, now]);
 
   const filtered =
-    activeTab === 'all'      ? active   :
+    activeTab === 'all' ? active   :
     activeTab === 'upcoming' ? upcoming :
     completed;
 
   const tabs: [FilterTab, string, number][] = [
-    ['all',       'All',       active.length + completed.length],
-    ['upcoming',  'Upcoming',  upcoming.length],
+    ['all', 'All', active.length + completed.length],
+    ['upcoming', 'Upcoming', upcoming.length],
     ['completed', 'Completed', completed.length],
   ];
 
@@ -198,8 +206,6 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     onDelete: handleDelete,
   };
 
-  // Кой вариант на списъка да рендерираме — извлечено като променлива,
-  // за да не пишем 4-етажен ternary в JSX-а.
   const isEmpty = activeTab === 'all'
     ? reminders.length === 0
     : filtered.length === 0;
@@ -214,12 +220,12 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   } else if (activeTab === 'all') {
     listContent = (
       <>
-        <ReminderGroup label="Overdue"   items={groups.overdue}  barClass="reminder-group-bar--overdue"   {...cardProps} />
-        <ReminderGroup label="Today"     items={groups.today}    barClass="reminder-group-bar--today"     {...cardProps} />
+        <ReminderGroup label="Overdue" items={groups.overdue} barClass="reminder-group-bar--overdue" {...cardProps} />
+        <ReminderGroup label="Today" items={groups.today}  barClass="reminder-group-bar--today" {...cardProps} />
         <ReminderGroup label="Tomorrow"  items={groups.tomorrow} barClass="reminder-group-bar--tomorrow"  {...cardProps} />
-        <ReminderGroup label="This week" items={groups.week}     barClass="reminder-group-bar--week"      {...cardProps} />
-        <ReminderGroup label="Later"     items={groups.later}    barClass="reminder-group-bar--later"     {...cardProps} />
-        <ReminderGroup label="Completed" items={completed}       barClass="reminder-group-bar--completed" {...cardProps} />
+        <ReminderGroup label="This week" items={groups.week} barClass="reminder-group-bar--week" {...cardProps} />
+        <ReminderGroup label="Later"     items={groups.later} barClass="reminder-group-bar--later"  {...cardProps} />
+        <ReminderGroup label="Completed" items={completed} barClass="reminder-group-bar--completed" {...cardProps} />
       </>
     );
   } else {
