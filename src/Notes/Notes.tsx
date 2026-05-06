@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import HeaderBar from './HeaderBar';
 import RemindersPage from './Reminders/Reminders';
+import NotesList from './NotesList';
 import NotificationsPanel from './Notifications';
 import ToastContainer from './ToastNotification';
 import { useNotifications } from '../hooks/useNotifications';
@@ -59,7 +60,9 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
       {showReminders ? (
         <RemindersPage onBack={handleBackFromReminders} openReminderId={openReminderId} />
       ) : (
-        <main className="main-container" />
+        <main className="main-container">
+          <NotesList />
+        </main>
       )}
 
       {showNotifications && (

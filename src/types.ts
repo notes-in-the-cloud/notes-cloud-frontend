@@ -5,21 +5,19 @@ export type IconName =
   | "check" | "link" | "logout" | "eye" | "cloud" | "todo" | "calendar"
   | "flag" | "x" | "clock" | "alert" | "mail" | "device";
 
-export interface Todo {
-  id: string;
-  text: string;
-  done: boolean;
+export interface LoginData {
+  email: string;
+  password: string;
 }
 
 export interface Note {
+  id: string;
+  userId: string;
   title: string;
   content: string;
   color: string;
-  pinned: boolean;
-  shared: boolean;
-  todos: Todo[];
   updatedAt: string;
-  token: string;
+  createdAt: string;
 }
 
 export type Priority = 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
