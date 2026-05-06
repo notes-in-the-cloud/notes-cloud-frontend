@@ -129,8 +129,6 @@ export default function ReminderEditorModal({
           <div className="reminder-form-channels">
             {([
               { key: 'notifyInApp' as const, label: 'In app', icon: Icon.device },
-              { key: 'notifyEmail' as const, label: 'Email',  icon: Icon.mail   },
-              { key: 'notifyPush'  as const, label: 'Push',   icon: Icon.bellSmall },
             ]).map(c => (
               <button
                 key={c.key}

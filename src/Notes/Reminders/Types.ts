@@ -11,8 +11,6 @@ export interface ReminderFormData {
   reminderTime: string;
   priority: Priority;
   notifyInApp: boolean;
-  notifyEmail: boolean;
-  notifyPush: boolean;
 }
 
 export const EMPTY_FORM: ReminderFormData = {
@@ -22,8 +20,6 @@ export const EMPTY_FORM: ReminderFormData = {
   reminderTime: '',
   priority: 'MEDIUM',
   notifyInApp: true,
-  notifyEmail: false,
-  notifyPush: false,
 };
 
 export const PRIORITY_META: Record<Priority, { label: string; cls: string }> = {

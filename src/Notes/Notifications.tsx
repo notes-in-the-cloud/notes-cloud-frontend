@@ -1,6 +1,6 @@
 import type { Notification } from '../types';
 import type { NotifTab } from '../hooks/useNotifications';
-import './Notifications.css';
+import './Notifications.css'
 
 interface Props {
   notifications: Notification[];
@@ -17,10 +17,13 @@ interface Props {
 function formatTime(iso: string): string {
   const date = new Date(iso);
   const diffMin = Math.floor((Date.now() - date.getTime()) / 60_000);
-  if (diffMin < 1) return 'Just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 1)
+     return 'Just now';
+  if (diffMin < 60) 
+    return `${diffMin}m ago`;
   const h = Math.floor(diffMin / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) 
+    return `${h}h ago`;
   return date.toLocaleDateString();
 }
 
@@ -71,7 +74,6 @@ export default function NotificationsPanel({ notifications, unreadCount, totalCo
           {notifications.length === 0 ? (
             <div className="notif-empty">
               {tab === 'unread' ? 'No unread notifications.' : 'No notifications yet.'}
-
             </div>
           ) : (
             notifications.map(n => (

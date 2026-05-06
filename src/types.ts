@@ -1,11 +1,12 @@
-export type Page = "login" | "register" | "notes" | "detail" | "create" | "public";
-export type AlertSource = "auto" | "bell" | "list";
-export type IconName =
-  | "plus" | "search" | "pin" | "share" | "bell" | "edit" | "trash" | "back"
-  | "check" | "link" | "logout" | "eye" | "cloud" | "todo" | "calendar"
-  | "flag" | "x" | "clock" | "alert" | "mail" | "device";
+export type Page = 'login' | 'register' | 'notes';
 
 export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface SignUpData {
+  name: string;
   email: string;
   password: string;
 }
@@ -33,8 +34,6 @@ export interface Reminder {
   priority: Priority;
   status: ReminderStatus;
   notifyInApp: boolean;
-  notifyEmail: boolean;
-  notifyPush: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -60,14 +59,3 @@ export interface NotificationPayload {
   firedAt: string;
   type: string;
 }
-
-export interface SignUpData{
-    name: string;
-    email: string;
-    password: string;
-};
-
-export interface LoginData {
-    email: string;
-    password: string;
-};

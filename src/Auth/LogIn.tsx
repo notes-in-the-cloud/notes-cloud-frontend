@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import type { LoginData, Page } from '../types';
-import { saveSession } from './../Auth/Session';
+import { saveSession } from './Session';
 import './Auth.css';
 
 interface Props {
@@ -14,16 +14,26 @@ export default function LogIn({ onNavigate }: Props) {
 
   const onSubmit = (data: LoginData) => {
     setServerError('');
-    const raw = localStorage.getItem(data.email);
-    const userData = raw ? JSON.parse(raw) : null;
-    if (!userData || userData.password !== data.password) {
-      setServerError('Email or password is incorrect.');
+    const stored = localStorage.getItem(data.email);
+    if (!stored) {
+      setServerError('No account found with this email.');
       return;
     }
+
+    const userData = JSON.parse(stored);
+    if (userData.password !== data.password) {
+      setServerError('Incorrect password.');
+      return;
+    }
+
     saveSession({
-      userId: userData.userId ?? '',
-      userName: userData.name ?? '',
+      userId:       userData.userId ?? '',
+      userName:     userData.name ?? '',
+      email:        data.email,
+      accessToken:  'local-dev-token',
+      refreshToken: 'local-dev-refresh',
     });
+
     onNavigate('notes');
   };
 

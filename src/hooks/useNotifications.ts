@@ -17,12 +17,14 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   const allCount = allNotifications.length;
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) 
+      return;
     api.fetchUnreadCount(userId).then(setUnreadCount).catch(console.error);
   }, [userId]);
 
   useEffect(() => {
-    if (!userId || !isOpen) return;
+    if (!userId || !isOpen) 
+      return;
     if (tab === 'all') {
       api.fetchNotifications(userId).then(setAllNotifications).catch(console.error);
     } else {
@@ -31,8 +33,9 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, [userId, isOpen, tab]);
 
   useEffect(() => {
-    if (!userId)
-       return;
+    if (!userId) 
+      return;
+
     const client = new Client({
       brokerURL: 'ws://localhost:8084/ws',
       onConnect: () => {
@@ -62,21 +65,22 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, [userId]);
 
   const markAsRead = useCallback(async (id: string) => {
-    if (!userId) 
-      return;
+    if (!userId) return;
     const updated = await api.markAsRead(userId, id);
+
+
+    let wasUnread = false;
     setAllNotifications(prev => {
-      const wasUnread = prev.find(n => n.id === id)?.read === false;
-      if (wasUnread) 
-        setUnreadCount(c => Math.max(0, c - 1));
-      return prev.map(n => n.id === id ? updated : n);
+      wasUnread = prev.find(n => n.id === id)?.read === false;
+      return prev.map(n => (n.id === id ? updated : n));
     });
+
+    if (wasUnread) setUnreadCount(c => Math.max(0, c - 1));
     setUnreadNotifications(prev => prev.filter(n => n.id !== id));
   }, [userId]);
 
   const markAllAsRead = useCallback(async () => {
-    if (!userId) 
-      return;
+    if (!userId) return;
     await api.markAllAsRead(userId);
     const now = new Date().toISOString();
     setAllNotifications(prev => prev.map(n => ({ ...n, read: true, readAt: now })));
@@ -89,17 +93,20 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, []);
 
   const completeFromToast = useCallback(async (reminderId: string, toastId: string) => {
-    if (!userId) 
-      return;
-    try {
-      const reminder = await fetchReminderById(reminderId);
-      await updateReminder({ ...reminder, status: 'COMPLETED' });
-    } catch (e) {
-      console.error('Failed to complete reminder', e);
-    } finally {
-      setToasts(prev => prev.filter(t => t.id !== toastId));
+    if (!userId) return;
+    try{
+      const reminder=await fetchReminderById(reminderId);
+      const updated=await updateReminder({...reminder,status:'COMPLETED'});
+      window.dispatchEvent(new CustomEvent('reminder:updated',{detail:updated}));
+    }catch(e){
+      console.error('Failed to complete reminder',e);
+    }finally{
+      setToasts(prev=>prev.filter(t=>t.id!==toastId));
     }
   }, [userId]);
 
-  return { displayed, unreadCount, allCount, tab, setTab, toasts, dismissToast, completeFromToast, markAsRead, markAllAsRead };
+  return {
+    displayed, unreadCount, allCount, tab, setTab,
+    toasts, dismissToast, completeFromToast, markAsRead, markAllAsRead,
+  };
 }

@@ -3,6 +3,7 @@ import type { Notification, Priority } from '../types';
 import './Toast.css';
 
 const DURATION = 5000;
+const TICK_MS = 50;
 
 const PRIO_CLS: Record<Priority, string> = {
   URGENT: 'toast-prio--urgent',
@@ -29,10 +30,11 @@ function Toast({ toast, onDismiss, onComplete }: ToastProps) {
         clearInterval(interval);
         onDismiss(toast.id);
       }
-    }, 50);
+    }, TICK_MS);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [toast.id, onDismiss]);
+
+  const priorityLabel = toast.priority.charAt(0) + toast.priority.slice(1).toLowerCase();
 
   return (
     <div className="toast">
@@ -43,9 +45,7 @@ function Toast({ toast, onDismiss, onComplete }: ToastProps) {
 
       {toast.message && <div className="toast-message">{toast.message}</div>}
 
-      <span className={`toast-prio ${PRIO_CLS[toast.priority]}`}>
-        {toast.priority.charAt(0) + toast.priority.slice(1).toLowerCase()}
-      </span>
+      <span className={`toast-prio ${PRIO_CLS[toast.priority]}`}>{priorityLabel}</span>
 
       <div className="toast-actions">
         <button

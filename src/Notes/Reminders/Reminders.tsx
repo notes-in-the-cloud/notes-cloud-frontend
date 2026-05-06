@@ -1,17 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Reminder } from '../../types';
 import {
-  fetchReminders,
-  createReminder,
-  updateReminder,
-  deleteReminder,
+  fetchReminders, createReminder, updateReminder, deleteReminder,
 } from '../../api/reminders';
 
 import {
-  EMPTY_FORM,
-  type FilterTab,
-  type EnrichedReminder,
-  type ReminderFormData,
+  EMPTY_FORM, type FilterTab, type EnrichedReminder, type ReminderFormData,
 } from './Types';
 import { combineDateTime } from './Helper';
 import { Icon } from './Icons';
@@ -88,8 +82,6 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
       reminderTime: r.reminderTime.slice(0, 5),
       priority: r.priority,
       notifyInApp: r.notifyInApp,
-      notifyEmail: r.notifyEmail,
-      notifyPush: r.notifyPush,
     });
     setFormError('');
     setShowForm(true);
@@ -110,7 +102,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
       if (editingId) {
         const original = reminders.find(r => r.id === editingId)!;
         const updated = await updateReminder({ ...original, ...form });
-        setReminders(prev => prev.map(r => r.id === editingId ? updated : r));
+        setReminders(prev => prev.map(r => (r.id === editingId ? updated : r)));
       } else {
         const created = await createReminder({ ...form, status: 'PENDING' });
         setReminders(prev => [created, ...prev]);
@@ -131,7 +123,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
         ...r,
         status: r.status === 'COMPLETED' ? 'PENDING' : 'COMPLETED',
       });
-      setReminders(prev => prev.map(x => x.id === r.id ? updated : x));
+      setReminders(prev => prev.map(x => (x.id === r.id ? updated : x)));
     } catch (err) {
       console.error('Failed to toggle reminder:', err);
     } finally {
@@ -153,34 +145,40 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     }
   }
 
-  const enriched: EnrichedReminder[] = reminders.map(r => ({
-    ...r,
-    _date: combineDateTime(r.reminderDate, r.reminderTime),
-  }));
+  // Цялото обработване (sort, group по дата) се мемоизира — пресмята се
+  // само когато reminders/now реално се сменят, а не на всеки render.
+  const { active, completed, upcoming, groups } = useMemo(() => {
+    const enriched: EnrichedReminder[] = reminders.map(r => ({
+      ...r,
+      _date: combineDateTime(r.reminderDate, r.reminderTime),
+    }));
 
-  const active = enriched
-    .filter(r => r.status !== 'COMPLETED')
-    .sort((a, b) => a._date.getTime() - b._date.getTime());
+    const active = enriched
+      .filter(r => r.status !== 'COMPLETED')
+      .sort((a, b) => a._date.getTime() - b._date.getTime());
 
-  const completed = enriched
-    .filter(r => r.status === 'COMPLETED')
-    .sort((a, b) => b._date.getTime() - a._date.getTime());
+    const completed = enriched
+      .filter(r => r.status === 'COMPLETED')
+      .sort((a, b) => b._date.getTime() - a._date.getTime());
 
-  const overdue  = active.filter(r => r._date <  now);
-  const upcoming = active.filter(r => r._date >= now);
+    const overdue  = active.filter(r => r._date <  now);
+    const upcoming = active.filter(r => r._date >= now);
 
-  const todayStart    = new Date(now);          todayStart.setHours(0, 0, 0, 0);
-  const tomorrowStart = new Date(todayStart);   tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-  const tomorrowEnd   = new Date(tomorrowStart); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
-  const weekEnd       = new Date(todayStart);   weekEnd.setDate(weekEnd.getDate() + 7);
+    const todayStart    = new Date(now);          todayStart.setHours(0, 0, 0, 0);
+    const tomorrowStart = new Date(todayStart);   tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    const tomorrowEnd   = new Date(tomorrowStart); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
+    const weekEnd       = new Date(todayStart);   weekEnd.setDate(weekEnd.getDate() + 7);
 
-  const groups = {
-    overdue,
-    today:    active.filter(r => r._date >= now           && r._date < tomorrowStart),
-    tomorrow: active.filter(r => r._date >= tomorrowStart && r._date < tomorrowEnd),
-    week:     active.filter(r => r._date >= tomorrowEnd   && r._date < weekEnd),
-    later:    active.filter(r => r._date >= weekEnd),
-  };
+    const groups = {
+      overdue,
+      today:    active.filter(r => r._date >= now           && r._date < tomorrowStart),
+      tomorrow: active.filter(r => r._date >= tomorrowStart && r._date < tomorrowEnd),
+      week:     active.filter(r => r._date >= tomorrowEnd   && r._date < weekEnd),
+      later:    active.filter(r => r._date >= weekEnd),
+    };
+
+    return { active, completed, upcoming, groups };
+  }, [reminders, now]);
 
   const filtered =
     activeTab === 'all'      ? active   :
@@ -188,19 +186,51 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     completed;
 
   const tabs: [FilterTab, string, number][] = [
-    ['all',       'All',       enriched.length],
+    ['all',       'All',       active.length + completed.length],
     ['upcoming',  'Upcoming',  upcoming.length],
     ['completed', 'Completed', completed.length],
   ];
 
   const cardProps = {
-    now,
-    togglingId,
-    deletingId,
+    now, togglingId, deletingId,
     onOpenEdit: openEdit,
     onToggleComplete: handleToggleComplete,
     onDelete: handleDelete,
   };
+
+  // Кой вариант на списъка да рендерираме — извлечено като променлива,
+  // за да не пишем 4-етажен ternary в JSX-а.
+  const isEmpty = activeTab === 'all'
+    ? reminders.length === 0
+    : filtered.length === 0;
+
+  let listContent: React.ReactNode = null;
+  if (loading) {
+    listContent = <p className="reminders-empty">Loading...</p>;
+  } else if (error) {
+    listContent = <p className="reminders-empty reminders-empty--error">{error}</p>;
+  } else if (isEmpty) {
+    listContent = <ReminderEmptyState activeTab={activeTab} onCreate={openCreate} />;
+  } else if (activeTab === 'all') {
+    listContent = (
+      <>
+        <ReminderGroup label="Overdue"   items={groups.overdue}  barClass="reminder-group-bar--overdue"   {...cardProps} />
+        <ReminderGroup label="Today"     items={groups.today}    barClass="reminder-group-bar--today"     {...cardProps} />
+        <ReminderGroup label="Tomorrow"  items={groups.tomorrow} barClass="reminder-group-bar--tomorrow"  {...cardProps} />
+        <ReminderGroup label="This week" items={groups.week}     barClass="reminder-group-bar--week"      {...cardProps} />
+        <ReminderGroup label="Later"     items={groups.later}    barClass="reminder-group-bar--later"     {...cardProps} />
+        <ReminderGroup label="Completed" items={completed}       barClass="reminder-group-bar--completed" {...cardProps} />
+      </>
+    );
+  } else {
+    listContent = (
+      <div className="reminders-list">
+        {filtered.map(r => (
+          <ReminderCard key={r.id} reminder={r} {...cardProps} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="reminders-page">
@@ -219,8 +249,8 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
 
       <p className="reminders-page-subtitle">
         {active.length} active reminders
-        {overdue.length > 0 && (
-          <span className="reminders-overdue-count"> · {overdue.length} overdue</span>
+        {groups.overdue.length > 0 && (
+          <span className="reminders-overdue-count"> · {groups.overdue.length} overdue</span>
         )}
       </p>
 
@@ -237,27 +267,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
         ))}
       </div>
 
-      {loading && <p className="reminders-empty">Loading...</p>}
-      {error && <p className="reminders-empty reminders-empty--error">{error}</p>}
-
-      {!loading && !error && (activeTab === 'all' ? enriched.length === 0 : filtered.length === 0) ? (
-        <ReminderEmptyState activeTab={activeTab} onCreate={openCreate} />
-      ) : !loading && !error && activeTab === 'all' ? (
-        <>
-          <ReminderGroup label="Overdue"   items={groups.overdue}  barClass="reminder-group-bar--overdue"  {...cardProps} />
-          <ReminderGroup label="Today"     items={groups.today}    barClass="reminder-group-bar--today"    {...cardProps} />
-          <ReminderGroup label="Tomorrow"  items={groups.tomorrow} barClass="reminder-group-bar--tomorrow" {...cardProps} />
-          <ReminderGroup label="This week" items={groups.week}     barClass="reminder-group-bar--week"     {...cardProps} />
-          <ReminderGroup label="Later"     items={groups.later}    barClass="reminder-group-bar--later"    {...cardProps} />
-          <ReminderGroup label="Completed" items={completed}       barClass="reminder-group-bar--completed" {...cardProps} />
-        </>
-      ) : !loading && !error && (
-        <div className="reminders-list">
-          {filtered.map(r => (
-            <ReminderCard key={r.id} reminder={r} {...cardProps} />
-          ))}
-        </div>
-      )}
+      {listContent}
 
       {showForm && (
         <ReminderEditorModal

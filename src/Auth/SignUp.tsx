@@ -11,8 +11,6 @@ export default function SignUp({ onNavigate }: Props) {
   const [serverError, setServerError] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm<SignUpData>();
 
-
-  //using local storage for testing 
   const onSubmit = (data: SignUpData) => {
     setServerError('');
     if (localStorage.getItem(data.email)) {

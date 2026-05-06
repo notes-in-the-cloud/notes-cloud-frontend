@@ -81,12 +81,6 @@ export default function ReminderCard({
           {r.notifyInApp && (
             <span className="reminder-card-channel">{Icon.device}<span>In app</span></span>
           )}
-          {r.notifyEmail && (
-            <span className="reminder-card-channel">{Icon.mail}<span>Email</span></span>
-          )}
-          {r.notifyPush && (
-            <span className="reminder-card-channel">{Icon.bellSmall}<span>Push</span></span>
-          )}
         </div>
       </div>
 

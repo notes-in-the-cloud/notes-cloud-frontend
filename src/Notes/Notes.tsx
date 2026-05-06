@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import HeaderBar from './HeaderBar';
 import RemindersPage from './Reminders/Reminders';
 import NotesList from './NotesList';
@@ -19,20 +19,13 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [openReminderId, setOpenReminderId] = useState<string | undefined>(undefined);
 
-  const session = loadSession();
+  const session = useMemo(() => loadSession(), []);
   const userId = session?.userId ?? null;
   const userName = session?.userName;
+
   const {
-    displayed,
-    unreadCount,
-    allCount,
-    tab,
-    setTab,
-    toasts,
-    dismissToast,
-    completeFromToast,
-    markAsRead,
-    markAllAsRead,
+    displayed, unreadCount, allCount, tab, setTab,
+    toasts, dismissToast, completeFromToast, markAsRead, markAllAsRead,
   } = useNotifications(userId, showNotifications);
 
   function handleOpenReminder(reminderId: string) {
