@@ -7,9 +7,9 @@ const TICK_MS = 50;
 
 const PRIO_CLS: Record<Priority, string> = {
   URGENT: 'toast-prio--urgent',
-  HIGH:   'toast-prio--high',
+  HIGH: 'toast-prio--high',
   MEDIUM: 'toast-prio--medium',
-  LOW:    'toast-prio--low',
+  LOW: 'toast-prio--low',
 };
 
 interface ToastProps {

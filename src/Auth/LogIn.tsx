@@ -27,10 +27,10 @@ export default function LogIn({ onNavigate }: Props) {
     }
 
     saveSession({
-      userId:       userData.userId ?? '',
-      userName:     userData.name ?? '',
-      email:        data.email,
-      accessToken:  'local-dev-token',
+      userId: userData.userId ?? '',
+      userName: userData.name ?? '',
+      email: data.email,
+      accessToken: 'local-dev-token',
       refreshToken: 'local-dev-refresh',
     });
 

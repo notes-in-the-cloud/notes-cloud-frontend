@@ -19,16 +19,16 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   useEffect(() => {
     if (!userId) 
       return;
-    api.fetchUnreadCount(userId).then(setUnreadCount).catch(console.error);
+    api.fetchUnreadCount().then(setUnreadCount).catch(console.error);
   }, [userId]);
 
   useEffect(() => {
     if (!userId || !isOpen) 
       return;
     if (tab === 'all') {
-      api.fetchNotifications(userId).then(setAllNotifications).catch(console.error);
+      api.fetchNotifications().then(setAllNotifications).catch(console.error);
     } else {
-      api.fetchUnreadNotifications(userId).then(setUnreadNotifications).catch(console.error);
+      api.fetchUnreadNotifications().then(setUnreadNotifications).catch(console.error);
     }
   }, [userId, isOpen, tab]);
 
@@ -65,8 +65,9 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, [userId]);
 
   const markAsRead = useCallback(async (id: string) => {
-    if (!userId) return;
-    const updated = await api.markAsRead(userId, id);
+    if (!userId)
+       return;
+    const updated = await api.markAsRead(id);
 
 
     let wasUnread = false;
@@ -80,8 +81,9 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, [userId]);
 
   const markAllAsRead = useCallback(async () => {
-    if (!userId) return;
-    await api.markAllAsRead(userId);
+    if (!userId)
+       return;
+    await api.markAllAsRead();
     const now = new Date().toISOString();
     setAllNotifications(prev => prev.map(n => ({ ...n, read: true, readAt: now })));
     setUnreadNotifications([]);
@@ -93,7 +95,8 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   }, []);
 
   const completeFromToast = useCallback(async (reminderId: string, toastId: string) => {
-    if (!userId) return;
+    if (!userId) 
+      return;
     try{
       const reminder=await fetchReminderById(reminderId);
       const updated=await updateReminder({...reminder,status:'COMPLETED'});

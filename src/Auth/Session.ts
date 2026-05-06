@@ -28,7 +28,7 @@ export function loadSession(): Session | null {
   return {
     userId,
     userName: localStorage.getItem(USER_NAME_KEY) ?? '',
-    email:localStorage.getItem(EMAIL_KEY)     ?? '',
+    email:localStorage.getItem(EMAIL_KEY) ?? '',
     accessToken,
     refreshToken,
   };

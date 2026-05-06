@@ -89,7 +89,6 @@ export default function NotesList() {
     }
   }
 
-  // If viewing a single note, show the detail page
   if (viewingNote) {
     return (
       <div className="notes-list-page">

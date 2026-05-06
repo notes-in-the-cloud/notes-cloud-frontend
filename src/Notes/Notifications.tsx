@@ -35,7 +35,6 @@ const BellIcon = () => (
 );
 
 export default function NotificationsPanel({ notifications, unreadCount, totalCount, tab, onTabChange, onClose, onMarkAsRead, onMarkAllAsRead, onOpenReminder }: Props) {
-
   function handleClick(n: Notification) {
     if (!n.read) onMarkAsRead(n.id);
     onOpenReminder(n.reminderId);
