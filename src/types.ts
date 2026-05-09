@@ -59,3 +59,56 @@ export interface NotificationPayload {
   firedAt: string;
   type: string;
 }
+
+export type TodoPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+
+export interface TodoTask {
+  id: string;
+  listId: string | null;
+  userId: string;
+  title: string;
+  done: boolean;
+  priority: TodoPriority;
+  dueDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TodoList {
+  id: string;
+  userId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TodoListWithTasks {
+  id: string;
+  userId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  tasks: TodoTask[];
+}
+
+export interface CreateTodoTaskData {
+  listId?: string | null;
+  title: string;
+  priority?: TodoPriority | null;
+  dueDate?: string | null;
+}
+
+export interface UpdateTodoTaskData {
+  title?: string | null;
+  priority?: TodoPriority | null;
+  dueDate?: string | null;
+  done?: boolean | null;
+}
+
+export interface CreateTodoListData {
+  title: string;
+}
+
+export interface UpdateTodoListData {
+  title: string;
+}

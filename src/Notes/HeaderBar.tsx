@@ -9,12 +9,24 @@ interface Props{
     onLogOut: () => void;
     onNotifications?: () => void;
     onReminders?: () => void;
+    onTodos?: () => void;
     onSettings?: () => void;
     darkMode?: boolean;
     onToggleTheme?: () => void;
 }
 
-export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLogOut,onNotifications,onReminders,onSettings,darkMode=true,onToggleTheme}:Props){
+export default function HeaderBar({
+  userName = "User",
+  userAvatar,
+  notifCount = 0,
+  onLogOut,
+  onNotifications,
+  onReminders,
+  onTodos,
+  onSettings,
+  darkMode = true,
+  onToggleTheme
+}: Props) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +66,13 @@ export default function HeaderBar({userName="User",userAvatar,notifCount=0,onLog
             </div>
 
             <div className="notes-header-action">
+                <button className="notes-header-icon-btn" aria-label="Todos" onClick={onTodos}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                </button>
+
                 <button className="notes-header-icon-btn" aria-label="Reminders" onClick={onReminders}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10" />

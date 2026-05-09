@@ -1,0 +1,153 @@
+.todos-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3.5rem 1rem 2rem;
+  overflow-y: auto;
+  animation: todosFadeIn 0.18s ease;
+}
+
+.todos-modal {
+  width: 100%;
+  max-width: 28rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 1.5rem 1.6rem 1.4rem;
+  color: var(--text);
+  animation: todosScaleIn 0.2s ease;
+}
+
+@keyframes todosFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes todosScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.todos-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.todos-modal-header h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.4rem;
+  margin: 0;
+  color: var(--text);
+}
+
+.todos-modal-header p {
+  color: var(--textMuted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.todos-modal-close {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--textMuted);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.todos-modal-close:hover {
+  color: var(--text);
+  border-color: var(--borderLight);
+}
+
+.todos-modal-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 0.25rem;
+  border-radius: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.todos-modal-switch-btn {
+  border: none;
+  background: transparent;
+  color: var(--textMuted);
+  border-radius: 0.5rem;
+  padding: 0.55rem;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.todos-modal-switch-btn.active {
+  background: var(--accentDim);
+  color: var(--accent);
+}
+
+.todos-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.todos-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.todos-modal-hint {
+  color: var(--textMuted);
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.todos-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding-top: 0.35rem;
+}
+
+@media (max-width: 640px) {
+  .todos-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .todos-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .todos-modal-footer button {
+    width: 100%;
+  }
+}
