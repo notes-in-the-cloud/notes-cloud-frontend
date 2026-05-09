@@ -1,0 +1,38 @@
+.todos-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.todos-tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 1.2rem;
+  padding: 0.4rem 0.95rem;
+  cursor: pointer;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--textMuted);
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s;
+}
+
+.todos-tab:hover {
+  border-color: var(--borderLight);
+  color: var(--text);
+}
+
+.todos-tab--active {
+  background: var(--accentDim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.todos-tab span {
+  font-size: 0.7rem;
+  opacity: 0.75;
+}

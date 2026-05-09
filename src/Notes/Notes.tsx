@@ -7,6 +7,7 @@ import ToastContainer from './ToastNotification';
 import { useNotifications } from '../hooks/useNotifications';
 import { loadSession } from '../Auth/Session';
 import type { Page } from '../types';
+import TodosPage from './Todos/Todos';
 
 interface Props {
   onNavigate: (page: Page) => void;
@@ -23,6 +24,8 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const userId = session?.userId ?? null;
   const userName = session?.userName;
 
+  const [showTodos, setShowTodos] = useState(false);
+
   const {
     displayed, unreadCount, allCount, tab, setTab,
     toasts, dismissToast, completeFromToast, markAsRead, markAllAsRead,
@@ -38,19 +41,34 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
     setOpenReminderId(undefined);
   }
 
+  function handleBackFromTodos() {
+    setShowTodos(false);
+  }
+
   return (
     <div className="notes-layout">
       <HeaderBar
         userName={userName}
         onLogOut={() => onNavigate('login')}
-        onReminders={() => { setOpenReminderId(undefined); setShowReminders(true); }}
+        onTodos={() => {
+          setShowReminders(false);
+          setOpenReminderId(undefined);
+          setShowTodos(true);
+        }}
+        onReminders={() => {
+          setShowTodos(false);
+          setOpenReminderId(undefined);
+          setShowReminders(true);
+        }}
         onNotifications={() => setShowNotifications(prev => !prev)}
         notifCount={unreadCount}
         darkMode={darkMode}
         onToggleTheme={onToggleTheme}
       />
 
-      {showReminders ? (
+      {showTodos ? (
+        <TodosPage onBack={handleBackFromTodos} />
+      ) : showReminders ? (
         <RemindersPage onBack={handleBackFromReminders} openReminderId={openReminderId} />
       ) : (
         <main className="main-container">

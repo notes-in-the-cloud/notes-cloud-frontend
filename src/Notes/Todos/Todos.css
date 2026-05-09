@@ -1,0 +1,54 @@
+/* Buttons */
+
+.todos-primary-btn,
+.todos-secondary-btn {
+  border-radius: 0.55rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: inherit;
+  padding: 0.6rem 1rem;
+  white-space: nowrap;
+}
+
+.todos-primary-btn {
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.todos-secondary-btn {
+  background: var(--accentDim);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.todos-primary-btn:disabled,
+.todos-secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Errors */
+
+.todos-error {
+  background: var(--errorDim);
+  border: 1px solid var(--error);
+  color: var(--error);
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Empty state */
+
+.todos-empty {
+  background: var(--card);
+  border: 1px dashed var(--border);
+  color: var(--textMuted);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
