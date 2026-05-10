@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
-import HeaderBar from './HeaderBar';
-import RemindersPage from './Reminders/Reminders';
+import HeaderBar from '../Header/HeaderBar';
+import RemindersPage from '../Reminders/Reminders';
 import NotesList from './NotesList';
-import NotificationsPanel from './Notifications';
-import ToastContainer from './ToastNotification';
-import { useNotifications } from '../hooks/useNotifications';
-import { loadSession } from '../Auth/Session';
-import type { Page } from '../types';
-import TodosPage from './Todos/Todos';
+import NotificationsPanel from '../Notifications/Notifications';
+import ToastContainer from '../Notifications/ToastNotification';
+import { useNotifications } from '../../hooks/useNotifications';
+import { loadSession } from '../../Auth/Session';
+import type { Page } from '../../types';
+import TodosPage from '../Todos/Todos';
 
 interface Props {
   onNavigate: (page: Page) => void;

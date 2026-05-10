@@ -1,4 +1,7 @@
-import type { Note } from '../types';
+import { useState } from 'react';
+import type { Note } from '../../types';
+import { createShareLink, extractToken, buildFrontendShareUrl } from '../../api/sharing';
+import './NoteDetail.css';
 
 interface Props {
   note: Note;
@@ -8,12 +11,22 @@ interface Props {
 }
 
 export default function NoteDetail({ note, onBack, onEdit, onDelete }: Props) {
+  const [copied, setCopied] = useState(false);
+
   const formattedDate = new Date(note.updatedAt).toLocaleString(undefined, {
     day: 'numeric',
     month: 'long',
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  async function handleShare() {
+    const response = await createShareLink(note);
+    const url = buildFrontendShareUrl(extractToken(response.url));
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   return (
     <div className="note-detail">
@@ -27,6 +40,16 @@ export default function NoteDetail({ note, onBack, onEdit, onDelete }: Props) {
         </button>
 
         <div className="note-detail-actions">
+          <button className="note-detail-action-btn" onClick={handleShare} aria-label="Share">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            <span>{copied ? 'Copied!' : 'Share'}</span>
+          </button>
           <button className="note-detail-action-btn" onClick={() => onEdit(note)} aria-label="Edit">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />

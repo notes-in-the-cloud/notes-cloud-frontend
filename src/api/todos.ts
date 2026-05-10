@@ -28,8 +28,6 @@ function requireUserId(): string {
   return userId;
 }
 
-// --- Todo tasks ---
-
 export async function fetchStandaloneTasks(): Promise<TodoTask[]> {
   const userId = requireUserId();
 
@@ -102,8 +100,6 @@ export async function deleteTodoTask(taskId: string): Promise<void> {
     throw new Error('Failed to delete todo task');
   }
 }
-
-// --- Todo lists ---
 
 export async function fetchTodoListsWithTasks(): Promise<TodoListWithTasks[]> {
   const userId = requireUserId();

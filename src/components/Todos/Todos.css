@@ -1,5 +1,3 @@
-/* Buttons */
-
 .todos-primary-btn,
 .todos-secondary-btn {
   border-radius: 0.55rem;
@@ -40,8 +38,6 @@
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
-
-/* Empty state */
 
 .todos-empty {
   background: var(--card);

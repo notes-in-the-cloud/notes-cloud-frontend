@@ -1,5 +1,5 @@
-import type { Notification } from '../types';
-import type { NotifTab } from '../hooks/useNotifications';
+import type { Notification } from '../../types';
+import type { NotifTab } from '../../hooks/useNotifications';
 import './Notifications.css'
 
 interface Props {

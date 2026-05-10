@@ -1,7 +1,6 @@
 import type { Note } from '../types';
 import { getCurrentUserId } from '../Auth/Session';
 
-// Dev: http://localhost:5075  |  Docker: http://localhost:8082
 const BASE = 'http://localhost:5075';
 
 function authHeaders(): HeadersInit {
