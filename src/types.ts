@@ -34,6 +34,7 @@ export interface Reminder {
   priority: Priority;
   status: ReminderStatus;
   notifyInApp: boolean;
+  timezone?: string;
   createdAt: string;
   updatedAt: string;
 }

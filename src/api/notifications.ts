@@ -1,52 +1,57 @@
 import type { Notification } from '../types';
+import { API_BASE_URL, authHeaders, parseApiResponse } from './config';
 
-const BASE = 'http://localhost:8084';
+export async function fetchNotifications(read?: boolean): Promise<Notification[]> {
+  const url = new URL(`${API_BASE_URL}/notifications`);
 
-function userId(): string {
-  return localStorage.getItem('userId') ?? '';
-}
+  if (read !== undefined) {
+    url.searchParams.set('read', String(read));
+  }
 
-const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: authHeaders(),
+  });
 
-export async function fetchNotifications(): Promise<Notification[]> {
-  const res = await fetch(`${BASE}/api/users/${userId()}/notifications`, { headers });
-  if (!res.ok) throw new Error('Failed to fetch notifications');
-  return res.json();
+  return parseApiResponse<Notification[]>(res);
 }
 
 export async function fetchUnreadNotifications(): Promise<Notification[]> {
-  const res = await fetch(`${BASE}/api/users/${userId()}/notifications?read=false`, { headers });
-  if (!res.ok) throw new Error('Failed to fetch unread notifications');
-  return res.json();
+  return fetchNotifications(false);
 }
 
 export async function markAsRead(id: string): Promise<Notification> {
-  const res = await fetch(`${BASE}/api/users/${userId()}/notifications/${id}/read`, {
+  const res = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
     method: 'POST',
-    headers,
+    headers: authHeaders(),
   });
-  if (!res.ok) throw new Error('Failed to mark notification as read');
-  return res.json();
+
+  return parseApiResponse<Notification>(res);
 }
 
 export async function markAllAsRead(): Promise<void> {
-  const res = await fetch(`${BASE}/api/users/${userId()}/notifications/read-all`, {
+  const res = await fetch(`${API_BASE_URL}/notifications/read-all`, {
     method: 'POST',
-    headers,
+    headers: authHeaders(),
   });
-  if (!res.ok) throw new Error('Failed to mark all notifications as read');
+
+  return parseApiResponse<void>(res);
 }
 
 export async function fetchUnreadCount(): Promise<number> {
-  const res = await fetch(`${BASE}/api/users/${userId()}/notifications/unread-count`, { headers });
-  if (!res.ok) throw new Error('Failed to fetch unread count');
-  return res.json();
+  const res = await fetch(`${API_BASE_URL}/notifications/unread-count`, {
+    method: 'GET',
+    headers: authHeaders(),
+  });
+
+  return parseApiResponse<number>(res);
 }
 
 export async function deleteAllNotifications(): Promise<void> {
-  const res = await fetch(`${BASE}/api/users/${userId()}/notifications`, {
+  const res = await fetch(`${API_BASE_URL}/notifications`, {
     method: 'DELETE',
-    headers,
+    headers: authHeaders(),
   });
-  if (!res.ok) throw new Error('Failed to delete notifications');
+
+  return parseApiResponse<void>(res);
 }
