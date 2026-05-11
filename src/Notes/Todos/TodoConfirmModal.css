@@ -1,0 +1,89 @@
+.todos-confirm-modal {
+  width: 100%;
+  max-width: 27rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 1.4rem;
+  color: var(--text);
+  animation: todosScaleIn 0.2s ease;
+}
+
+.todos-confirm-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 0.8rem;
+  background: var(--errorDim);
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.todos-confirm-content h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--text);
+  margin: 0 0 0.45rem;
+}
+
+.todos-confirm-content p {
+  color: var(--textMuted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.todos-confirm-content strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.todos-confirm-note {
+  margin-top: 0.65rem !important;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+}
+
+.todos-confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.todos-danger-btn {
+  border: 1px solid var(--error);
+  background: var(--error);
+  color: white;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.875rem;
+  font-family: inherit;
+  padding: 0.6rem 1rem;
+  white-space: nowrap;
+}
+
+.todos-danger-btn:hover {
+  filter: brightness(1.05);
+}
+
+.todos-danger-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .todos-confirm-footer {
+    flex-direction: column-reverse;
+  }
+
+  .todos-confirm-footer button {
+    width: 100%;
+  }
+}
