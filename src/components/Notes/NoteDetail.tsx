@@ -22,7 +22,7 @@ export default function NoteDetail({ note, onBack, onEdit, onDelete }: Props) {
 
   async function handleShare() {
     const response = await createShareLink(note);
-    const url = buildFrontendShareUrl(extractToken(response.url));
+    const url = buildFrontendShareUrl(extractToken(response));
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

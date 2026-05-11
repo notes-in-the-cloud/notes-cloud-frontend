@@ -210,7 +210,7 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
 function getNotificationPayload(
   message: GatewaySocketMessage<NotificationPayload> | NotificationPayload,
 ): NotificationPayload | null {
-  if ('data' in message && message.data) {
+  if (isGatewaySocketMessage(message)) {
     if (
       message.type !== 'REMINDER_NOTIFICATION' &&
       message.type !== 'REMINDER_FIRED'
@@ -226,4 +226,10 @@ function getNotificationPayload(
   }
 
   return message;
+}
+
+function isGatewaySocketMessage(
+  message: GatewaySocketMessage<NotificationPayload> | NotificationPayload,
+): message is GatewaySocketMessage<NotificationPayload> {
+  return 'data' in message;
 }
