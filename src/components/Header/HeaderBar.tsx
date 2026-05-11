@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Avatar from "../../Avatar"
 import './HeaderBar.css';
+import { me } from '../../api/auth';
 
 interface Props{
     userName?:string;
@@ -28,6 +29,8 @@ export default function HeaderBar({
   onToggleTheme
 }: Props) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [userInfo, setUserInfo] = useState<{ displayName: string; email: string } | null>(null);
+    const [loadingUser, setLoadingUser] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
 
@@ -40,6 +43,23 @@ export default function HeaderBar({
         if (menuOpen) document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [menuOpen]);
+
+    // Fetch user data when menu opens
+    useEffect(() => {
+        if (menuOpen && !userInfo && !loadingUser) {
+            setLoadingUser(true);
+            me()
+                .then(user => {
+                    setUserInfo({ displayName: user.displayName, email: user.email });
+                })
+                .catch(err => {
+                    console.error('Failed to fetch user profile:', err);
+                })
+                .finally(() => {
+                    setLoadingUser(false);
+                });
+        }
+    }, [menuOpen, userInfo, loadingUser]);
 
     const handleLogOut = () => {
         localStorage.removeItem('userId');
@@ -103,8 +123,12 @@ export default function HeaderBar({
                     {menuOpen && (
                         <div className="avatar-dropdown">
                             <div className="avatar-dropdown-user">
-                                <Avatar name={userName} src={userAvatar} size={32} />
-                                <span className="avatar-dropdown-name">{userName}</span>
+                                <Avatar name={userInfo?.displayName || userName} src={userAvatar} size={32} />
+                                <div className="avatar-dropdown-user-info">
+                                    <span className="avatar-dropdown-name">{userInfo?.displayName || userName}</span>
+                                    {loadingUser && <span className="avatar-dropdown-email">Loading...</span>}
+                                    {userInfo?.email && <span className="avatar-dropdown-email">{userInfo.email}</span>}
+                                </div>
                             </div>
 
                             <div className="avatar-dropdown-divider" />
