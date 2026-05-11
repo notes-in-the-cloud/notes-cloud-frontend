@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { Page } from '../../types';
 import './Auth.css';
 
@@ -8,40 +8,11 @@ interface Props {
 }
 
 export default function EmailCodeVerify({ email, onNavigate }: Props) {
-  const [digits, setDigits] = useState(['', '', '', '', '', '']);
-  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+  const [code, setCode] = useState('');
 
-  function handleChange(index: number, value: string) {
-    if (!/^\d?$/.test(value)) 
-      return;
-    const next = [...digits];
-    next[index] = value;
-    setDigits(next);
-    if (value && index < 5) 
-      inputs.current[index + 1]?.focus();
-  }
-
-  function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Backspace' && !digits[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
-    }
-  }
-
-  function handlePaste(e: React.ClipboardEvent) {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (!pasted) 
-      return;
-    e.preventDefault();
-    const next = [...digits];
-    for (let i = 0; i < pasted.length; i++) 
-      next[i] = pasted[i];
-    setDigits(next);
-    inputs.current[Math.min(pasted.length, 5)]?.focus();
-  }
-
-  //connect with backend
   function handleVerify(e: React.FormEvent) {
     e.preventDefault();
+    onNavigate('login');
   }
 
   return (
@@ -56,29 +27,25 @@ export default function EmailCodeVerify({ email, onNavigate }: Props) {
 
         <h1 className="auth-title">Check your email</h1>
         <p className="auth-subtitle">
-          We sent a 6-digit code to<br />
+          We sent a verification code to<br />
           <span className="auth-email-highlight">{email}</span>
         </p>
 
         <form onSubmit={handleVerify}>
-          <div className="auth-code-row" onPaste={handlePaste}>
-            {digits.map((d, i) => (
-              <input
-                key={i}
-                ref={el => { inputs.current[i] = el; }}
-                className="auth-code-input"
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={d}
-                onChange={e => handleChange(i, e.target.value)}
-                onKeyDown={e => handleKeyDown(i, e)}
-                autoFocus={i === 0}
-              />
-            ))}
+          <div className="auth-field">
+            <input
+              className="auth-input"
+              type="text"
+              placeholder="Paste your verification code"
+              value={code}
+              onChange={e => setCode(e.target.value.trim())}
+              autoFocus
+              autoComplete="off"
+              spellCheck={false}
+            />
           </div>
 
-          <button className="auth-btn" type="submit" disabled={digits.some(d => !d)}>
+          <button className="auth-btn" type="submit" disabled={!code}>
             Verify
           </button>
         </form>

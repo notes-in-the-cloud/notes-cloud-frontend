@@ -12,7 +12,6 @@ export default function LogIn({ onNavigate }: Props) {
   const [serverError, setServerError] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm<LoginData>();
 
-  //connect with backend
   function handleOAuth(_provider: 'google' | 'gitlab') {
   }
 
