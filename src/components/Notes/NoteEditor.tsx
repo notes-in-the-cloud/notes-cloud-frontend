@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Note } from '../../types';
 import './NoteEditor.css';
 
@@ -16,6 +16,12 @@ export default function NoteEditor({ existing, submitting, formError, onSubmit, 
   const [title, setTitle] = useState(existing?.title ?? '');
   const [content, setContent] = useState(existing?.content ?? '');
   const [color, setColor] = useState(existing?.color ?? NOTE_COLORS[0]);
+
+  useEffect(() => {
+    setTitle(existing?.title ?? '');
+    setContent(existing?.content ?? '');
+    setColor(existing?.color ?? NOTE_COLORS[0]);
+  }, [existing]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

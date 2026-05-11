@@ -5,7 +5,7 @@ import NotesList from './NotesList';
 import NotificationsPanel from '../Notifications/Notifications';
 import ToastContainer from '../Notifications/ToastNotification';
 import { useNotifications } from '../../hooks/useNotifications';
-import { loadSession } from '../../Auth/Session';
+import { loadSession } from '../Auth/Session';
 import type { Page } from '../../types';
 import TodosPage from '../Todos/Todos';
 
@@ -60,7 +60,13 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
           setOpenReminderId(undefined);
           setShowReminders(true);
         }}
-        onNotifications={() => setShowNotifications(prev => !prev)}
+        onNotifications={() => {
+          if (!showNotifications && unreadCount > 0) {
+            setTab('unread');
+          }
+
+          setShowNotifications(prev => !prev);
+        }}
         notifCount={unreadCount}
         darkMode={darkMode}
         onToggleTheme={onToggleTheme}

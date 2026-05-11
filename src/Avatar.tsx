@@ -11,8 +11,6 @@ export default function Avatar({ name = 'User', src, size = 36 }: Props) {
 
   if (src) {
     return <img className="avatar-img" src={src} alt={name} width={size} height={size} />;
-    
-
   }
 
   return (

@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import type { SignUpData, Page } from '../types';
+import type { SignUpData, Page } from '../../types';
 import './Auth.css';
 
 interface Props {

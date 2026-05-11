@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import LogIn from './Auth/LogIn';
-import SignUp from './Auth/SignUp';
-import Notes from './Notes/Notes';
-import { loadSession } from './Auth/Session';
+import LogIn from './components/Auth/LogIn';
+import SignUp from './components/Auth/SignUp';
+import Notes from './components/Notes/Notes';
+import { loadSession } from './components/Auth/Session';
 import type { Page } from './types';
 
 const THEME_KEY = 'darkMode';

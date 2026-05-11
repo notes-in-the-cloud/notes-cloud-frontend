@@ -21,6 +21,8 @@ export default function NotesList() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
+    setError('');
     fetchNotes()
       .then(data => setNotes(data))
       .catch(err => {

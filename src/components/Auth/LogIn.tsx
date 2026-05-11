@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import type { LoginData, Page } from '../types';
+import type { LoginData, Page } from '../../types';
 import { saveSession } from './Session';
 import './Auth.css';
 

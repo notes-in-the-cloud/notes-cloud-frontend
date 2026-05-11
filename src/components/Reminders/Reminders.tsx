@@ -5,7 +5,7 @@ import {
 } from '../../api/reminders';
 
 import {
-  EMPTY_FORM, type FilterTab, type EnrichedReminder, type ReminderFormData,
+  EMPTY_FORM, type FilterTab, type EnrichedReminder, type ReminderFormData, getBrowserTimezone,
 } from './Types';
 import { combineDateTime } from './Helper';
 import { Icon } from './Icons';
@@ -44,6 +44,8 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+    setError('');
     fetchReminders()
       .then(setReminders)
       .catch(err => {
@@ -75,7 +77,10 @@ useEffect(()=>{
 
   function openCreate() {
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm({
+      ...EMPTY_FORM,
+      timezone: getBrowserTimezone(),
+    });
     setFormError('');
     setShowForm(true);
   }
@@ -89,6 +94,7 @@ useEffect(()=>{
       reminderTime: r.reminderTime.slice(0, 5),
       priority: r.priority,
       notifyInApp: r.notifyInApp,
+      timezone: r.timezone ?? getBrowserTimezone(),
     });
     setFormError('');
     setShowForm(true);
@@ -97,7 +103,10 @@ useEffect(()=>{
   function closeForm() {
     setShowForm(false);
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm({
+      ...EMPTY_FORM,
+      timezone: getBrowserTimezone(),
+    });
     setFormError('');
   }
 
@@ -105,13 +114,19 @@ useEffect(()=>{
     e.preventDefault();
     setFormError('');
     setSubmitting(true);
+
+    const payload = {
+      ...form,
+      timezone: form.timezone || getBrowserTimezone(),
+    };
+
     try {
       if (editingId) {
         const original = reminders.find(r => r.id === editingId)!;
-        const updated = await updateReminder({ ...original, ...form });
+        const updated = await updateReminder({ ...original, ...payload });
         setReminders(prev => prev.map(r => (r.id === editingId ? updated : r)));
       } else {
-        const created = await createReminder({ ...form, status: 'PENDING' });
+        const created = await createReminder({ ...payload, status: 'PENDING' });
         setReminders(prev => [created, ...prev]);
       }
       closeForm();
