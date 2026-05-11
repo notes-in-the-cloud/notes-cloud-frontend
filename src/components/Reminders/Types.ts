@@ -11,7 +11,6 @@ export interface ReminderFormData {
   reminderTime: string;
   priority: Priority;
   notifyInApp: boolean;
-  timezone: string;
 }
 
 export const EMPTY_FORM: ReminderFormData = {
@@ -21,7 +20,6 @@ export const EMPTY_FORM: ReminderFormData = {
   reminderTime: '',
   priority: 'MEDIUM',
   notifyInApp: true,
-  timezone: getBrowserTimezone(),
 };
 
 export const PRIORITY_META: Record<Priority, { label: string; cls: string }> = {
@@ -30,7 +28,3 @@ export const PRIORITY_META: Record<Priority, { label: string; cls: string }> = {
   MEDIUM: { label: 'Medium', cls: 'reminder-prio--medium' },
   LOW:    { label: 'Low',    cls: 'reminder-prio--low'    },
 };
-
-export function getBrowserTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-}

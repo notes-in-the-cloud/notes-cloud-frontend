@@ -3,8 +3,9 @@ import type { Reminder } from '../../types';
 import {
   fetchReminders, createReminder, updateReminder, deleteReminder,
 } from '../../api/reminders';
+
 import {
-  EMPTY_FORM, type FilterTab, type EnrichedReminder, type ReminderFormData, getBrowserTimezone,
+  EMPTY_FORM, type FilterTab, type EnrichedReminder, type ReminderFormData,
 } from './Types';
 import { combineDateTime } from './Helper';
 import { Icon } from './Icons';
@@ -52,14 +53,14 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    function onReminderUpdated(e: Event) {
-      const updated = (e as CustomEvent<Reminder>).detail;
-      setReminders(prev => prev.map(r => (r.id === updated.id ? updated : r)));
-    }
-    window.addEventListener('reminder:updated', onReminderUpdated);
-    return () => window.removeEventListener('reminder:updated', onReminderUpdated);
-  }, []);
+useEffect(()=>{
+  function onReminderUpdated(e:Event){
+    const updated=(e as CustomEvent<Reminder>).detail;
+    setReminders(prev=>prev.map(r=>(r.id===updated.id?updated:r)));
+  }
+  window.addEventListener('reminder:updated',onReminderUpdated);
+  return ()=>window.removeEventListener('reminder:updated',onReminderUpdated);
+},[]);
 
   const openedIds = useRef(new Set<string>());
   useEffect(() => {
@@ -74,10 +75,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
 
   function openCreate() {
     setEditingId(null);
-    setForm({
-      ...EMPTY_FORM,
-      timezone: getBrowserTimezone(),
-    });
+    setForm(EMPTY_FORM);
     setFormError('');
     setShowForm(true);
   }
@@ -91,7 +89,6 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
       reminderTime: r.reminderTime.slice(0, 5),
       priority: r.priority,
       notifyInApp: r.notifyInApp,
-      timezone: r.timezone ?? getBrowserTimezone(),
     });
     setFormError('');
     setShowForm(true);
@@ -100,10 +97,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   function closeForm() {
     setShowForm(false);
     setEditingId(null);
-    setForm({
-      ...EMPTY_FORM,
-      timezone: getBrowserTimezone(),
-    });
+    setForm(EMPTY_FORM);
     setFormError('');
   }
 
@@ -111,22 +105,15 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     e.preventDefault();
     setFormError('');
     setSubmitting(true);
-
-    const payload = {
-      ...form,
-      timezone: form.timezone || getBrowserTimezone(),
-    };
-
     try {
       if (editingId) {
         const original = reminders.find(r => r.id === editingId)!;
-        const updated = await updateReminder({ ...original, ...payload });
+        const updated = await updateReminder({ ...original, ...form });
         setReminders(prev => prev.map(r => (r.id === editingId ? updated : r)));
       } else {
-        const created = await createReminder({ ...payload, status: 'PENDING' });
+        const created = await createReminder({ ...form, status: 'PENDING' });
         setReminders(prev => [created, ...prev]);
       }
-
       closeForm();
     } catch (err) {
       console.error('Failed to save reminder:', err);
@@ -152,7 +139,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this reminder?'))
+    if (!confirm('Delete this reminder?')) 
       return;
     setDeletingId(id);
     try {
@@ -180,29 +167,29 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
       .filter(r => r.status === 'COMPLETED')
       .sort((a, b) => b._date.getTime() - a._date.getTime());
 
-    const overdue = active.filter(r => r._date < now);
+    const overdue  = active.filter(r => r._date <  now);
     const upcoming = active.filter(r => r._date >= now);
 
-    const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
-    const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-    const tomorrowEnd = new Date(tomorrowStart); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
-    const weekEnd = new Date(todayStart); weekEnd.setDate(weekEnd.getDate() + 7);
+    const todayStart    = new Date(now);          todayStart.setHours(0, 0, 0, 0);
+    const tomorrowStart = new Date(todayStart);   tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    const tomorrowEnd   = new Date(tomorrowStart); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
+    const weekEnd       = new Date(todayStart);   weekEnd.setDate(weekEnd.getDate() + 7);
 
     const groups = {
       overdue,
-      today: active.filter(r => r._date >= now && r._date < tomorrowStart),
+      today:    active.filter(r => r._date >= now           && r._date < tomorrowStart),
       tomorrow: active.filter(r => r._date >= tomorrowStart && r._date < tomorrowEnd),
-      week: active.filter(r => r._date >= tomorrowEnd && r._date < weekEnd),
-      later: active.filter(r => r._date >= weekEnd),
+      week:     active.filter(r => r._date >= tomorrowEnd   && r._date < weekEnd),
+      later:    active.filter(r => r._date >= weekEnd),
     };
 
     return { active, completed, upcoming, groups };
   }, [reminders, now]);
 
   const filtered =
-    activeTab === 'all' ? active :
-      activeTab === 'upcoming' ? upcoming :
-        completed;
+    activeTab === 'all' ? active   :
+    activeTab === 'upcoming' ? upcoming :
+    completed;
 
   const tabs: [FilterTab, string, number][] = [
     ['all', 'All', active.length + completed.length],
@@ -232,10 +219,10 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     listContent = (
       <>
         <ReminderGroup label="Overdue" items={groups.overdue} barClass="reminder-group-bar--overdue" {...cardProps} />
-        <ReminderGroup label="Today" items={groups.today} barClass="reminder-group-bar--today" {...cardProps} />
-        <ReminderGroup label="Tomorrow" items={groups.tomorrow} barClass="reminder-group-bar--tomorrow"  {...cardProps} />
+        <ReminderGroup label="Today" items={groups.today}  barClass="reminder-group-bar--today" {...cardProps} />
+        <ReminderGroup label="Tomorrow"  items={groups.tomorrow} barClass="reminder-group-bar--tomorrow"  {...cardProps} />
         <ReminderGroup label="This week" items={groups.week} barClass="reminder-group-bar--week" {...cardProps} />
-        <ReminderGroup label="Later" items={groups.later} barClass="reminder-group-bar--later"  {...cardProps} />
+        <ReminderGroup label="Later"     items={groups.later} barClass="reminder-group-bar--later"  {...cardProps} />
         <ReminderGroup label="Completed" items={completed} barClass="reminder-group-bar--completed" {...cardProps} />
       </>
     );
