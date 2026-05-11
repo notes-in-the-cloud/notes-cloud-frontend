@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { Note } from '../types';
-import { fetchNotes, createNote, updateNote, deleteNote } from '../api/notes';
+import type { Note } from '../../types';
+import { fetchNotes, createNote, updateNote, deleteNote } from '../../api/notes';
 import NoteCard from './NoteCard';
 import NoteDetail from './NoteDetail';
 import NoteEditor from './NoteEditor';
@@ -21,8 +21,6 @@ export default function NotesList() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
     fetchNotes()
       .then(data => setNotes(data))
       .catch(err => {

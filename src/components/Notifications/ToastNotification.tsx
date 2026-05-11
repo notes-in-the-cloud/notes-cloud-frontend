@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Notification, Priority } from '../types';
+import type { Notification, Priority } from '../../types';
 import './Toast.css';
 
 const DURATION = 5000;

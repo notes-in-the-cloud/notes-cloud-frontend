@@ -43,8 +43,6 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
     fetchReminders()
       .then(setReminders)
       .catch(err => {
@@ -223,7 +221,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
     ? reminders.length === 0
     : filtered.length === 0;
 
-  let listContent: React.ReactNode = null;
+  let listContent: React.ReactNode;
   if (loading) {
     listContent = <p className="reminders-empty">Loading...</p>;
   } else if (error) {

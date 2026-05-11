@@ -1,0 +1,78 @@
+.shared-note-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+.shared-note-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.shared-note-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accentDim);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+}
+
+.shared-note-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 60vh;
+  color: var(--textMuted);
+  font-size: 1rem;
+}
+
+.shared-note-state--error {
+  color: var(--error);
+}
+
+.shared-note-state--error span {
+  font-size: 0.85rem;
+  color: var(--textMuted);
+}
+
+.shared-note-body {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+}
+
+.shared-note-color-bar {
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+}
+
+.shared-note-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.shared-note-meta {
+  font-size: 0.8rem;
+  color: var(--textMuted);
+  margin-bottom: 2rem;
+}
+
+.shared-note-content {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+}
