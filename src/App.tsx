@@ -29,6 +29,22 @@ function App() {
 
   // Check for OAuth redirect on mount
   useEffect(() => {
+    // Check for OAuth errors first
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const errorMessage = urlParams.get('message');
+
+    if (error) {
+      // Clear error from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Display error (you might want to show this in a toast/alert)
+      console.error('OAuth error:', error, errorMessage);
+      alert(errorMessage || 'Authentication failed. Please try again.');
+      return;
+    }
+
+    // Check for successful OAuth login
     const accessTokenCookie = getCookie('access_token');
 
     if (accessTokenCookie && !loadSession()) {
@@ -44,6 +60,9 @@ function App() {
           accessToken: accessTokenCookie,
           refreshToken: '', // In httpOnly cookie
         });
+
+        // Clear any success indicator from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
 
         // Navigate to notes
         setPage('notes');
