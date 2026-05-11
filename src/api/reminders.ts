@@ -1,5 +1,5 @@
 import type { Reminder } from '../types';
-import { API_BASE_URL, authHeaders, parseApiResponse } from './config';
+import { API_BASE_URL, parseApiResponse, fetchWithAuth } from './config';
 
 export type ReminderStatus = 'PENDING' | 'COMPLETED';
 
@@ -15,9 +15,8 @@ export async function fetchReminders(status?: ReminderStatus): Promise<Reminder[
     url.searchParams.set('status', status);
   }
 
-  const res = await fetch(url.toString(), {
+  const res = await fetchWithAuth(url.toString(), {
     method: 'GET',
-    headers: authHeaders(),
   });
 
   return parseApiResponse<Reminder[]>(res);
@@ -32,18 +31,16 @@ export async function fetchCompletedReminders(): Promise<Reminder[]> {
 }
 
 export async function fetchReminderById(reminderId: string): Promise<Reminder> {
-  const res = await fetch(`${API_BASE_URL}/reminders/${reminderId}`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/reminders/${reminderId}`, {
     method: 'GET',
-    headers: authHeaders(),
   });
 
   return parseApiResponse<Reminder>(res);
 }
 
 export async function createReminder(data: CreateReminderData): Promise<Reminder> {
-  const res = await fetch(`${API_BASE_URL}/reminders`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/reminders`, {
     method: 'POST',
-    headers: authHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -52,9 +49,8 @@ export async function createReminder(data: CreateReminderData): Promise<Reminder
 
 // Gateway supports PUT /api/v1/reminders, not PUT /api/v1/reminders/{id}
 export async function updateReminder(data: Reminder): Promise<Reminder> {
-  const res = await fetch(`${API_BASE_URL}/reminders`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/reminders`, {
     method: 'PUT',
-    headers: authHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -62,9 +58,8 @@ export async function updateReminder(data: Reminder): Promise<Reminder> {
 }
 
 export async function deleteReminder(reminderId: string): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/reminders/${reminderId}`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/reminders/${reminderId}`, {
     method: 'DELETE',
-    headers: authHeaders(),
   });
 
   return parseApiResponse<void>(res);

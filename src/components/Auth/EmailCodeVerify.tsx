@@ -1,5 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { Page } from '../../types';
+import { verifyEmail, resendVerification } from '../../api/auth';
+import { ApiError } from '../../api/config';
 import './Auth.css';
 
 interface Props {
@@ -8,40 +10,54 @@ interface Props {
 }
 
 export default function EmailCodeVerify({ email, onNavigate }: Props) {
-  const [digits, setDigits] = useState(['', '', '', '', '', '']);
-  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [serverError, setServerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isResending, setIsResending] = useState(false);
 
-  function handleChange(index: number, value: string) {
-    if (!/^\d?$/.test(value)) 
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault();
+    setServerError('');
+
+    if (!verificationCode.trim()) {
+      setServerError('Please enter the verification code.');
       return;
-    const next = [...digits];
-    next[index] = value;
-    setDigits(next);
-    if (value && index < 5) 
-      inputs.current[index + 1]?.focus();
-  }
+    }
 
-  function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Backspace' && !digits[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+    try {
+      await verifyEmail({ verificationCode: verificationCode.trim() });
+      setSuccessMessage('Email verified successfully! Redirecting to login...');
+      setTimeout(() => onNavigate('login'), 2000);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.code === 'INVALID_VERIFICATION_CODE') {
+          setServerError('Invalid or expired verification code.');
+        } else {
+          setServerError(error.message || 'Verification failed. Please try again.');
+        }
+      } else {
+        setServerError('An unexpected error occurred. Please try again.');
+      }
     }
   }
 
-  function handlePaste(e: React.ClipboardEvent) {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (!pasted) 
-      return;
-    e.preventDefault();
-    const next = [...digits];
-    for (let i = 0; i < pasted.length; i++) 
-      next[i] = pasted[i];
-    setDigits(next);
-    inputs.current[Math.min(pasted.length, 5)]?.focus();
-  }
+  async function handleResend() {
+    setServerError('');
+    setSuccessMessage('');
+    setIsResending(true);
 
-  //connect with backend
-  function handleVerify(e: React.FormEvent) {
-    e.preventDefault();
+    try {
+      await resendVerification({ email });
+      setSuccessMessage('A new verification code has been sent to your email.');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setServerError(error.message || 'Failed to resend code. Please try again.');
+      } else {
+        setServerError('An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setIsResending(false);
+    }
   }
 
   return (
@@ -56,36 +72,50 @@ export default function EmailCodeVerify({ email, onNavigate }: Props) {
 
         <h1 className="auth-title">Check your email</h1>
         <p className="auth-subtitle">
-          We sent a 6-digit code to<br />
+          We sent a verification code to<br />
           <span className="auth-email-highlight">{email}</span>
         </p>
 
+        {serverError && <div className="auth-error-banner">{serverError}</div>}
+        {successMessage && <div className="auth-success-banner" style={{
+          padding: '12px',
+          marginBottom: '16px',
+          backgroundColor: '#d1fae5',
+          color: '#065f46',
+          borderRadius: '8px',
+          fontSize: '14px',
+          textAlign: 'center'
+        }}>{successMessage}</div>}
+
         <form onSubmit={handleVerify}>
-          <div className="auth-code-row" onPaste={handlePaste}>
-            {digits.map((d, i) => (
-              <input
-                key={i}
-                ref={el => { inputs.current[i] = el; }}
-                className="auth-code-input"
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={d}
-                onChange={e => handleChange(i, e.target.value)}
-                onKeyDown={e => handleKeyDown(i, e)}
-                autoFocus={i === 0}
-              />
-            ))}
+          <div className="auth-field">
+            <label className="auth-label">Verification Code</label>
+            <input
+              className="auth-input"
+              type="text"
+              placeholder="Paste your verification code"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value)}
+              autoFocus
+              style={{ fontFamily: 'monospace' }}
+            />
           </div>
 
-          <button className="auth-btn" type="submit" disabled={digits.some(d => !d)}>
+          <button className="auth-btn" type="submit" disabled={!verificationCode.trim()}>
             Verify
           </button>
         </form>
 
         <p className="auth-footer">
           Didn't receive it?{' '}
-          <button className="auth-link" type="button">Resend code</button>
+          <button
+            className="auth-link"
+            type="button"
+            onClick={handleResend}
+            disabled={isResending}
+          >
+            {isResending ? 'Sending...' : 'Resend code'}
+          </button>
         </p>
         <p className="auth-footer" style={{ marginTop: '8px' }}>
           <button className="auth-link" type="button" onClick={() => onNavigate('login')}>
