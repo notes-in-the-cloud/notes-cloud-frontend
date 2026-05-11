@@ -60,7 +60,13 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
           setOpenReminderId(undefined);
           setShowReminders(true);
         }}
-        onNotifications={() => setShowNotifications(prev => !prev)}
+        onNotifications={() => {
+          if (!showNotifications && unreadCount > 0) {
+            setTab('unread');
+          }
+
+          setShowNotifications(prev => !prev);
+        }}
         notifCount={unreadCount}
         darkMode={darkMode}
         onToggleTheme={onToggleTheme}
