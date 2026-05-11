@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { Page } from '../../types';
+import { verifyEmail, resendVerification } from '../../api/auth';
+import { ApiError } from '../../api/config';
 import './Auth.css';
 
 interface Props {
@@ -8,11 +10,54 @@ interface Props {
 }
 
 export default function EmailCodeVerify({ email, onNavigate }: Props) {
-  const [code, setCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [serverError, setServerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isResending, setIsResending] = useState(false);
 
-  function handleVerify(e: React.FormEvent) {
+  async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
-    onNavigate('login');
+    setServerError('');
+
+    if (!verificationCode.trim()) {
+      setServerError('Please enter the verification code.');
+      return;
+    }
+
+    try {
+      await verifyEmail({ verificationCode: verificationCode.trim() });
+      setSuccessMessage('Email verified successfully! Redirecting to login...');
+      setTimeout(() => onNavigate('login'), 2000);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.code === 'INVALID_VERIFICATION_CODE') {
+          setServerError('Invalid or expired verification code.');
+        } else {
+          setServerError(error.message || 'Verification failed. Please try again.');
+        }
+      } else {
+        setServerError('An unexpected error occurred. Please try again.');
+      }
+    }
+  }
+
+  async function handleResend() {
+    setServerError('');
+    setSuccessMessage('');
+    setIsResending(true);
+
+    try {
+      await resendVerification({ email });
+      setSuccessMessage('A new verification code has been sent to your email.');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setServerError(error.message || 'Failed to resend code. Please try again.');
+      } else {
+        setServerError('An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setIsResending(false);
+    }
   }
 
   return (
@@ -31,28 +76,46 @@ export default function EmailCodeVerify({ email, onNavigate }: Props) {
           <span className="auth-email-highlight">{email}</span>
         </p>
 
+        {serverError && <div className="auth-error-banner">{serverError}</div>}
+        {successMessage && <div className="auth-success-banner" style={{
+          padding: '12px',
+          marginBottom: '16px',
+          backgroundColor: '#d1fae5',
+          color: '#065f46',
+          borderRadius: '8px',
+          fontSize: '14px',
+          textAlign: 'center'
+        }}>{successMessage}</div>}
+
         <form onSubmit={handleVerify}>
           <div className="auth-field">
+            <label className="auth-label">Verification Code</label>
             <input
               className="auth-input"
               type="text"
               placeholder="Paste your verification code"
-              value={code}
-              onChange={e => setCode(e.target.value.trim())}
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value)}
               autoFocus
-              autoComplete="off"
-              spellCheck={false}
+              style={{ fontFamily: 'monospace' }}
             />
           </div>
 
-          <button className="auth-btn" type="submit" disabled={!code}>
+          <button className="auth-btn" type="submit" disabled={!verificationCode.trim()}>
             Verify
           </button>
         </form>
 
         <p className="auth-footer">
           Didn't receive it?{' '}
-          <button className="auth-link" type="button">Resend code</button>
+          <button
+            className="auth-link"
+            type="button"
+            onClick={handleResend}
+            disabled={isResending}
+          >
+            {isResending ? 'Sending...' : 'Resend code'}
+          </button>
         </p>
         <p className="auth-footer" style={{ marginTop: '8px' }}>
           <button className="auth-link" type="button" onClick={() => onNavigate('login')}>

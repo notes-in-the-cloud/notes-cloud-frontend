@@ -1,23 +1,31 @@
-import { API_BASE_URL, authHeaders, jsonHeaders, parseApiResponse } from './config';
+import {
+  API_BASE_URL,
+  authHeaders,
+  jsonHeaders,
+  parseApiResponse,
+  fetchWithAuth,
+  clearTokens,
+  saveTokens
+} from './config';
 
 export interface AccessToken {
   token: string;
-  tokenType?: string;
-  expiresIn?: number;
-  expiresAt?: string;
+  tokenType: string;
+  expiresIn: number;
+  expiresAt: string;
 }
 
 export interface TokenBundle {
-  accessToken: AccessToken | string;
+  accessToken: AccessToken;
   refreshToken: string;
 }
 
 export interface UserResponse {
   id: string;
-  displayName?: string;
-  name?: string;
+  displayName: string;
   email: string;
-  createdAt?: string;
+  emailVerified: boolean;
+  createdAt: string;
   updatedAt?: string;
 }
 
@@ -33,8 +41,7 @@ export interface LoginRequest {
 }
 
 export interface VerifyEmailRequest {
-  email: string;
-  code: string;
+  verificationCode: string;
 }
 
 export interface ResendVerificationRequest {
@@ -51,34 +58,50 @@ export async function registerUser(data: RegisterRequest): Promise<UserResponse>
   return parseApiResponse<UserResponse>(res);
 }
 
-export async function login(data: LoginRequest): Promise<TokenBundle> {
+export async function login(data: LoginRequest): Promise<AccessToken> {
   const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: jsonHeaders(),
+    credentials: 'include', // Include cookies - backend sets refresh_token cookie
     body: JSON.stringify(data),
   });
 
-  return parseApiResponse<TokenBundle>(res);
+  // Response contains only AccessToken (refresh token is in httpOnly cookie)
+  const accessToken = await parseApiResponse<AccessToken>(res);
+
+  // Save only access token (refresh token is in httpOnly cookie)
+  saveTokens(accessToken.token);
+
+  return accessToken;
 }
 
-export async function logout(refreshToken: string): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/auth/logout`, {
-    method: 'POST',
-    headers: jsonHeaders(),
-    body: JSON.stringify({ refreshToken }),
-  });
+export async function logout(refreshToken?: string): Promise<void> {
+  try {
+    // Refresh token is in httpOnly cookie, sent automatically
+    const res = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: jsonHeaders(),
+      credentials: 'include', // Important! Sends refresh_token cookie
+    });
 
-  return parseApiResponse<void>(res);
+    await parseApiResponse<void>(res);
+  } finally {
+    // Clear tokens regardless of logout success
+    // Backend will clear the refresh_token cookie
+    clearTokens();
+  }
 }
 
-export async function refresh(refreshToken: string): Promise<TokenBundle> {
+export async function refresh(refreshToken?: string): Promise<AccessToken> {
+  // Refresh token is in httpOnly cookie, sent automatically
   const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: 'POST',
     headers: jsonHeaders(),
-    body: JSON.stringify({ refreshToken }),
+    credentials: 'include', // Important! Sends refresh_token cookie
   });
 
-  return parseApiResponse<TokenBundle>(res);
+  // Response contains only AccessToken (new refresh token set in cookie)
+  return parseApiResponse<AccessToken>(res);
 }
 
 export async function verifyEmail(data: VerifyEmailRequest): Promise<void> {
@@ -102,9 +125,9 @@ export async function resendVerification(data: ResendVerificationRequest): Promi
 }
 
 export async function me(): Promise<UserResponse> {
-  const res = await fetch(`${API_BASE_URL}/me`, {
+  // Use fetchWithAuth for automatic token refresh
+  const res = await fetchWithAuth(`${API_BASE_URL}/me`, {
     method: 'GET',
-    headers: authHeaders(),
   });
 
   return parseApiResponse<UserResponse>(res);

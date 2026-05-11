@@ -2,6 +2,8 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import type { LoginData, Page } from '../../types';
 import { saveSession } from './Session';
+import { login, startGoogleLogin, startGitLabLogin } from '../../api/auth';
+import { ApiError } from '../../api/config';
 import './Auth.css';
 
 interface Props {
@@ -12,32 +14,61 @@ export default function LogIn({ onNavigate }: Props) {
   const [serverError, setServerError] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm<LoginData>();
 
-  function handleOAuth(_provider: 'google' | 'gitlab') {
+  //connect with backend
+  function handleOAuth(provider: 'google' | 'gitlab') {
+    if (provider === 'google') {
+      startGoogleLogin();
+    } else {
+      startGitLabLogin();
+    }
   }
 
-  const onSubmit = (data: LoginData) => {
+  const onSubmit = async (data: LoginData) => {
     setServerError('');
-    const stored = localStorage.getItem(data.email);
-    if (!stored) {
-      setServerError('No account found with this email.');
-      return;
+
+    try {
+      // Login returns only AccessToken (refresh token is in httpOnly cookie)
+      const accessToken = await login({
+        email: data.email,
+        password: data.password,
+      });
+
+      // login() already saves access token to localStorage
+      // Extract userId from JWT payload
+      try {
+        const payload = JSON.parse(atob(accessToken.token.split('.')[1]));
+        saveSession({
+          userId: payload.userId || payload.sub || '',
+          userName: payload.name || '',
+          email: data.email,
+          accessToken: accessToken.token,
+          refreshToken: '', // Refresh token is in httpOnly cookie, not accessible
+        });
+      } catch {
+        // If JWT parsing fails, store what we have
+        saveSession({
+          userId: '',
+          userName: '',
+          email: data.email,
+          accessToken: accessToken.token,
+          refreshToken: '', // Refresh token is in httpOnly cookie
+        });
+      }
+
+      onNavigate('notes');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.code === 'INVALID_LOGIN_CREDENTIALS') {
+          setServerError('Invalid email or password.');
+        } else if (error.code === 'EMAIL_NOT_VERIFIED') {
+          setServerError('Please verify your email before logging in.');
+        } else {
+          setServerError(error.message || 'Login failed. Please try again.');
+        }
+      } else {
+        setServerError('An unexpected error occurred. Please try again.');
+      }
     }
-
-    const userData = JSON.parse(stored);
-    if (userData.password !== data.password) {
-      setServerError('Incorrect password.');
-      return;
-    }
-
-    saveSession({
-      userId: userData.userId ?? '',
-      userName: userData.name ?? '',
-      email: data.email,
-      accessToken: 'local-dev-token',
-      refreshToken: 'local-dev-refresh',
-    });
-
-    onNavigate('notes');
   };
 
   return (

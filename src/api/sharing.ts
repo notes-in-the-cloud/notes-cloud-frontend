@@ -1,5 +1,5 @@
 import type { Note } from '../types';
-import { API_BASE_URL, authHeaders, parseApiResponse } from './config';
+import { API_BASE_URL, parseApiResponse, fetchWithAuth } from './config';
 
 export interface ShareLinkResponse {
   token: string;
@@ -21,15 +21,15 @@ export interface SharedNoteResponse {
 export async function createShareLink(noteOrId: Note | string): Promise<ShareLinkResponse> {
   const noteId = typeof noteOrId === 'string' ? noteOrId : noteOrId.id;
 
-  const res = await fetch(`${API_BASE_URL}/notes/${noteId}/share-links`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/notes/${noteId}/share-links`, {
     method: 'POST',
-    headers: authHeaders(),
   });
 
   return parseApiResponse<ShareLinkResponse>(res);
 }
 
 export async function openShareLink(token: string): Promise<SharedNoteResponse> {
+  // Share links are public, no auth needed
   const res = await fetch(`${API_BASE_URL}/share-links/${token}`, {
     method: 'GET',
   });

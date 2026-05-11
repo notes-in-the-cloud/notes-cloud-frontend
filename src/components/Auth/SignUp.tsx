@@ -1,6 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import type { SignUpData, Page } from '../../types';
+import { registerUser } from '../../api/auth';
+import { ApiError } from '../../api/config';
 import './Auth.css';
 
 interface Props {
@@ -12,15 +14,33 @@ export default function SignUp({ onNavigate, onEmailSubmit }: Props) {
   const [serverError, setServerError] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm<SignUpData>();
 
-  const onSubmit = (data: SignUpData) => {
+  const onSubmit = async (data: SignUpData) => {
     setServerError('');
-    if (localStorage.getItem(data.email)) {
-      setServerError('An account with this email already exists.');
-      return;
+
+    try {
+      await registerUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+      });
+
+      // Registration successful, navigate to email verification
+      onEmailSubmit(data.email);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.code === 'EMAIL_ALREADY_EXISTS') {
+          setServerError('An account with this email already exists.');
+        } else if (error.code === 'INVALID_PASSWORD_LENGTH') {
+          setServerError('Password must be at least 8 characters long.');
+        } else if (error.code === 'VALIDATION_FAILED') {
+          setServerError('Please check your input and try again.');
+        } else {
+          setServerError(error.message || 'Registration failed. Please try again.');
+        }
+      } else {
+        setServerError('An unexpected error occurred. Please try again.');
+      }
     }
-    const userId = crypto.randomUUID();
-    localStorage.setItem(data.email, JSON.stringify({ name: data.name, password: data.password, userId }));
-    onEmailSubmit(data.email);
   };
 
   return (
