@@ -1,4 +1,4 @@
-export type Page = 'login' | 'register' | 'notes';
+export type Page = 'login' | 'register' | 'notes' | 'verify-email';
 
 export interface LoginData {
   email: string;

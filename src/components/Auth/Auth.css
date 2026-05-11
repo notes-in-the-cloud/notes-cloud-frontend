@@ -121,3 +121,106 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+.auth-oauth-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.auth-oauth-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.auth-oauth-btn:hover {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.auth-oauth-icon {
+  flex-shrink: 0;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--textMuted);
+  font-size: 13px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-send-code {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.auth-code-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.auth-code-input {
+  width: 46px;
+  height: 54px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.auth-code-input:focus {
+  border-color: var(--accent);
+}
+
+.auth-email-highlight {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.auth-google-icon path:nth-child(1) { fill: #4285F4; }
+.auth-google-icon path:nth-child(2) { fill: #34A853; }
+.auth-google-icon path:nth-child(3) { fill: #FBBC05; }
+.auth-google-icon path:nth-child(4) { fill: #EA4335; }
+
+.auth-gitlab-icon path:nth-child(1) { fill: #E24329; }
+.auth-gitlab-icon path:nth-child(2) { fill: #FC6D26; }
+.auth-gitlab-icon path:nth-child(3) { fill: #FCA326; }
+.auth-gitlab-icon path:nth-child(4) { fill: #E24329; }
+.auth-gitlab-icon path:nth-child(5) { fill: #FC6D26; }
+.auth-gitlab-icon path:nth-child(6) { fill: #FCA326; }
+.auth-gitlab-icon path:nth-child(7) { fill: #E24329; }

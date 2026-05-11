@@ -5,9 +5,10 @@ import './Auth.css';
 
 interface Props {
   onNavigate: (page: Page) => void;
+  onEmailSubmit: (email: string) => void;
 }
 
-export default function SignUp({ onNavigate }: Props) {
+export default function SignUp({ onNavigate, onEmailSubmit }: Props) {
   const [serverError, setServerError] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm<SignUpData>();
 
@@ -19,7 +20,7 @@ export default function SignUp({ onNavigate }: Props) {
     }
     const userId = crypto.randomUUID();
     localStorage.setItem(data.email, JSON.stringify({ name: data.name, password: data.password, userId }));
-    onNavigate('login');
+    onEmailSubmit(data.email);
   };
 
   return (
