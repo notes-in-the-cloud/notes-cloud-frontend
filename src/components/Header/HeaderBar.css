@@ -140,10 +140,25 @@
   padding: 0.75rem 1rem;
 }
 
+.avatar-dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow: hidden;
+}
+
 .avatar-dropdown-name {
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar-dropdown-email {
+  font-size: 0.75rem;
+  color: var(--textMuted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
