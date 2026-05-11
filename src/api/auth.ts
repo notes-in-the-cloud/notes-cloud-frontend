@@ -1,11 +1,10 @@
 import {
   API_BASE_URL,
-  authHeaders,
   jsonHeaders,
   parseApiResponse,
   fetchWithAuth,
   clearTokens,
-  saveTokens
+  saveTokens,
 } from './config';
 
 export interface AccessToken {
@@ -75,8 +74,8 @@ export async function login(data: LoginRequest): Promise<AccessToken> {
   return accessToken;
 }
 
-export async function logout(refreshToken?: string): Promise<void> {
-  try {
+export async function logout(): Promise<void> {
+    try {
     // Refresh token is in httpOnly cookie, sent automatically
     const res = await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
@@ -92,7 +91,7 @@ export async function logout(refreshToken?: string): Promise<void> {
   }
 }
 
-export async function refresh(refreshToken?: string): Promise<AccessToken> {
+export async function refresh(): Promise<AccessToken> {
   // Refresh token is in httpOnly cookie, sent automatically
   const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: 'POST',
