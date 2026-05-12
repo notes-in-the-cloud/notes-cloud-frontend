@@ -12,6 +12,8 @@ interface GatewaySocketMessage<T = unknown> {
 }
 
 export function useNotifications(userId: string | null, isOpen: boolean) {
+  const resolvedUserId = userId ?? getUserIdFromToken();
+
   const [unreadCount, setUnreadCount] = useState(0);
   const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<Notification[]>([]);
@@ -22,17 +24,17 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   const allCount = allNotifications.length;
 
   useEffect(() => {
-    if (!userId) {
+    if (!resolvedUserId) {
       return;
     }
 
     api.fetchUnreadCount()
       .then(setUnreadCount)
       .catch(console.error);
-  }, [userId]);
+  }, [resolvedUserId]);
 
   useEffect(() => {
-    if (!userId || !isOpen) {
+    if (!resolvedUserId || !isOpen) {
       return;
     }
 
@@ -45,10 +47,10 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
         .then(setUnreadNotifications)
         .catch(console.error);
     }
-  }, [userId, isOpen, tab]);
+  }, [resolvedUserId, isOpen, tab]);
 
   useEffect(() => {
-    if (!userId) {
+    if (!resolvedUserId) {
       return;
     }
 
@@ -85,7 +87,7 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
 
           const notif: Notification = {
             id: payload.notificationId,
-            userId,
+            userId: resolvedUserId,
             reminderId: payload.reminderId,
             heading: payload.heading,
             message: payload.message,
@@ -125,10 +127,10 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
         socket.close();
       }
     };
-  }, [userId]);
+  }, [resolvedUserId]);
 
   const markAsRead = useCallback(async (id: string) => {
-    if (!userId) {
+    if (!resolvedUserId) {
       return;
     }
 
@@ -146,10 +148,10 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
     }
 
     setUnreadNotifications(prev => prev.filter(n => n.id !== id));
-  }, [userId]);
+  }, [resolvedUserId]);
 
   const markAllAsRead = useCallback(async () => {
-    if (!userId) {
+    if (!resolvedUserId) {
       return;
     }
 
@@ -165,14 +167,14 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
 
     setUnreadNotifications([]);
     setUnreadCount(0);
-  }, [userId]);
+  }, [resolvedUserId]);
 
   const dismissToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
   const completeFromToast = useCallback(async (reminderId: string, toastId: string) => {
-    if (!userId) {
+    if (!resolvedUserId) {
       return;
     }
 
@@ -191,7 +193,7 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
     } finally {
       setToasts(prev => prev.filter(t => t.id !== toastId));
     }
-  }, [userId]);
+  }, [resolvedUserId]);
 
   return {
     displayed,
@@ -232,4 +234,23 @@ function isGatewaySocketMessage(
   message: GatewaySocketMessage<NotificationPayload> | NotificationPayload,
 ): message is GatewaySocketMessage<NotificationPayload> {
   return 'data' in message;
+}
+
+function getUserIdFromToken(): string | null {
+  const token = localStorage.getItem('accessToken');
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1])) as {
+      userId?: string;
+      sub?: string;
+    };
+
+    return payload.userId ?? payload.sub ?? null;
+  } catch {
+    return null;
+  }
 }
