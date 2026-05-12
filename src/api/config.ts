@@ -1,11 +1,29 @@
+type RuntimeConfig = {
+  API_BASE_URL?: string;
+  GATEWAY_BASE_URL?: string;
+  WS_REMINDERS_URL?: string;
+};
+
+declare global {
+  interface Window {
+    __APP_CONFIG__?: RuntimeConfig;
+  }
+}
+
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8090/api/v1';
+  window.__APP_CONFIG__?.API_BASE_URL ??
+  import.meta.env.VITE_API_BASE_URL ??
+  'http://localhost:8090/api/v1';
 
 export const GATEWAY_BASE_URL =
-  import.meta.env.VITE_GATEWAY_BASE_URL ?? 'http://localhost:8090';
+  window.__APP_CONFIG__?.GATEWAY_BASE_URL ??
+  import.meta.env.VITE_GATEWAY_BASE_URL ??
+  'http://localhost:8090';
 
 export const WS_BASE_URL =
-  import.meta.env.VITE_WS_GATEWAY_URL ?? 'ws://localhost:8090';
+  window.__APP_CONFIG__?.WS_REMINDERS_URL?.replace(/\/ws$/, '') ??
+  import.meta.env.VITE_WS_GATEWAY_URL ??
+  'ws://localhost:8090';
 
 export class ApiError extends Error {
   code: string;
