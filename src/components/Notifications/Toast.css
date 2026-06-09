@@ -133,7 +133,7 @@
 
 .toast-prio--urgent { background: var(--errorDim); color: var(--error); }
 .toast-prio--high   { background: var(--amberDim); color: var(--amber); }
-.toast-prio--medium { background: var(--accentDim); color: var(--accent); }
+.toast-prio--medium { background: var(--amberDim); color: var(--amber); }
 .toast-prio--low    { background: var(--successDim); color: var(--success); }
 
 .toast-actions {

@@ -376,7 +376,7 @@
 
 .reminder-prio--urgent { background: var(--errorDim);   color: var(--error);     }
 .reminder-prio--high   { background: var(--amberDim);   color: var(--amber);     }
-.reminder-prio--medium { background: var(--successDim); color: var(--success);   }
+.reminder-prio--medium { background: var(--amberDim);   color: var(--amber);     }
 .reminder-prio--low    { background: rgba(138, 133, 128, 0.15); color: var(--textMuted); }
 
 .reminders-empty {
@@ -643,7 +643,7 @@
 
 .reminder-form-pill--active.reminder-prio--urgent { border-color: var(--error);     background: var(--errorDim);   color: var(--error);     font-weight: 600; }
 .reminder-form-pill--active.reminder-prio--high   { border-color: var(--amber);     background: var(--amberDim);   color: var(--amber);     font-weight: 600; }
-.reminder-form-pill--active.reminder-prio--medium { border-color: var(--success);   background: var(--successDim); color: var(--success);   font-weight: 600; }
+.reminder-form-pill--active.reminder-prio--medium { border-color: var(--amber);     background: var(--amberDim);   color: var(--amber);     font-weight: 600; }
 .reminder-form-pill--active.reminder-prio--low    { border-color: var(--textMuted); background: rgba(138, 133, 128, 0.15); color: var(--text); font-weight: 600; }
 
 .reminder-form-channels {
