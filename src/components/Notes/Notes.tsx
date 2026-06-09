@@ -29,7 +29,7 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const [showTodos, setShowTodos] = useState(false);
 
   const {
-    displayed, unreadCount, allCount, tab, setTab,
+    displayed, unreadCount, allCount, latestNotification, tab, setTab,
     toasts, dismissToast, completeFromToast, markAsRead, markAllAsRead,
   } = useNotifications(userId, showNotifications);
 
@@ -71,6 +71,7 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
         }}
         onSettings={() => setShowSettings(true)}
         notifCount={unreadCount}
+        notificationPreview={latestNotification?.heading}
         darkMode={darkMode}
         onToggleTheme={onToggleTheme}
       />

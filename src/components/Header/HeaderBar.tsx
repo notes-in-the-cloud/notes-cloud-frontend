@@ -7,6 +7,7 @@ interface Props{
     userName?:string;
     userAvatar?:string;
     notifCount?:number;
+    notificationPreview?: string;
     onLogOut: () => void;
     onNotifications?: () => void;
     onReminders?: () => void;
@@ -20,6 +21,7 @@ export default function HeaderBar({
   userName = "User",
   userAvatar,
   notifCount = 0,
+  notificationPreview,
   onLogOut,
   onNotifications,
   onReminders,
@@ -46,7 +48,11 @@ export default function HeaderBar({
 
     // Fetch user data when menu opens
     useEffect(() => {
-        if (menuOpen && !userInfo && !loadingUser) {
+        if (!menuOpen || userInfo || loadingUser) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => {
             setLoadingUser(true);
             me()
                 .then(user => {
@@ -58,7 +64,9 @@ export default function HeaderBar({
                 .finally(() => {
                     setLoadingUser(false);
                 });
-        }
+        }, 0);
+
+        return () => window.clearTimeout(timeoutId);
     }, [menuOpen, userInfo, loadingUser]);
 
     const handleLogOut = () => {
@@ -99,6 +107,11 @@ export default function HeaderBar({
                     </svg>
                     {notifCount>0&&(
                         <span className="notes-header-badge">{notifCount>9?"9+":notifCount}</span>
+                    )}
+                    {notificationPreview && (
+                        <span className="notes-notification-preview" role="tooltip">
+                            {notificationPreview}
+                        </span>
                     )}
                 </button>
 
