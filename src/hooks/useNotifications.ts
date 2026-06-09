@@ -23,31 +23,48 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   const displayed = tab === 'all' ? allNotifications : unreadNotifications;
   const allCount = allNotifications.length;
 
-  useEffect(() => {
+  const refreshNotifications = useCallback(async () => {
     if (!resolvedUserId) {
       return;
     }
 
-    api.fetchUnreadCount()
-      .then(setUnreadCount)
-      .catch(console.error);
+    try {
+      const notifications = await api.fetchNotifications();
+      const sorted = sortNotifications(notifications);
+      const unread = sorted.filter(n => !n.read);
+
+      setAllNotifications(sorted);
+      setUnreadNotifications(unread);
+      setUnreadCount(unread.length);
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+
+      try {
+        const count = await api.fetchUnreadCount();
+        setUnreadCount(count);
+      } catch (countError) {
+        console.error('Failed to load unread notification count:', countError);
+      }
+    }
   }, [resolvedUserId]);
 
   useEffect(() => {
-    if (!resolvedUserId || !isOpen) {
-      return;
-    }
+    const timeoutId = window.setTimeout(() => {
+      void refreshNotifications();
+    }, 0);
 
-    if (tab === 'all') {
-      api.fetchNotifications()
-        .then(setAllNotifications)
-        .catch(console.error);
-    } else {
-      api.fetchUnreadNotifications()
-        .then(setUnreadNotifications)
-        .catch(console.error);
+    return () => window.clearTimeout(timeoutId);
+  }, [refreshNotifications]);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timeoutId = window.setTimeout(() => {
+        void refreshNotifications();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
-  }, [resolvedUserId, isOpen, tab]);
+  }, [isOpen, refreshNotifications]);
 
   useEffect(() => {
     if (!resolvedUserId) {
@@ -97,10 +114,17 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
             firedAt: payload.firedAt,
           };
 
-          setUnreadCount(prev => prev + 1);
-          setAllNotifications(prev => [notif, ...prev]);
-          setUnreadNotifications(prev => [notif, ...prev]);
-          setToasts(prev => [...prev, notif]);
+          setAllNotifications(prev => upsertNotification(prev, notif));
+          setUnreadNotifications(prev => {
+            const next = upsertNotification(prev, notif).filter(n => !n.read);
+            setUnreadCount(next.length);
+            return next;
+          });
+          setToasts(prev => upsertNotification(prev, notif));
+
+          window.setTimeout(() => {
+            void refreshNotifications();
+          }, 300);
         } catch (error) {
           console.error('Failed to parse reminder websocket message:', error);
         }
@@ -127,7 +151,7 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
         socket.close();
       }
     };
-  }, [resolvedUserId]);
+  }, [refreshNotifications, resolvedUserId]);
 
   const markAsRead = useCallback(async (id: string) => {
     if (!resolvedUserId) {
@@ -136,19 +160,16 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
 
     const updated = await api.markAsRead(id);
 
-    let wasUnread = false;
+    setAllNotifications(prev => prev.map(n => (n.id === id ? updated : n)));
 
-    setAllNotifications(prev => {
-      wasUnread = prev.find(n => n.id === id)?.read === false;
-      return prev.map(n => (n.id === id ? updated : n));
+    setUnreadNotifications(prev => {
+      const next = prev.filter(n => n.id !== id);
+      setUnreadCount(next.length);
+      return next;
     });
 
-    if (wasUnread) {
-      setUnreadCount(c => Math.max(0, c - 1));
-    }
-
-    setUnreadNotifications(prev => prev.filter(n => n.id !== id));
-  }, [resolvedUserId]);
+    void refreshNotifications();
+  }, [refreshNotifications, resolvedUserId]);
 
   const markAllAsRead = useCallback(async () => {
     if (!resolvedUserId) {
@@ -207,6 +228,20 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
     markAsRead,
     markAllAsRead,
   };
+}
+
+function sortNotifications(notifications: Notification[]): Notification[] {
+  return [...notifications].sort(
+    (a, b) => new Date(b.firedAt).getTime() - new Date(a.firedAt).getTime()
+  );
+}
+
+function upsertNotification(
+  notifications: Notification[],
+  notification: Notification,
+): Notification[] {
+  const withoutCurrent = notifications.filter(n => n.id !== notification.id);
+  return sortNotifications([notification, ...withoutCurrent]);
 }
 
 function getNotificationPayload(

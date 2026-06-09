@@ -766,6 +766,102 @@
   background: var(--errorDim);
 }
 
+.reminder-form-btn--danger {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+.reminder-form-btn--danger:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.reminder-form-btn--danger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.reminder-delete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1100;
+  animation: reminderFadeIn 0.18s ease;
+}
+
+.reminder-delete-modal {
+  width: 100%;
+  max-width: 27rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  padding: 1.4rem;
+  animation: reminderScaleIn 0.2s ease;
+}
+
+.reminder-delete-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 0.8rem;
+  background: var(--errorDim);
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.reminder-delete-content h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--text);
+  margin: 0 0 0.45rem;
+}
+
+.reminder-delete-content p {
+  color: var(--textMuted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.reminder-delete-content strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.reminder-delete-note {
+  margin-top: 0.65rem !important;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+}
+
+.reminder-delete-label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--textMuted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 1rem 0 0.35rem;
+}
+
+.reminder-delete-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
 @media (max-width: 720px) {
   .reminders-page {
     padding: 1.5rem 1.1rem;
@@ -798,5 +894,13 @@
 
   .reminder-form-quick {
     grid-template-columns: 1fr;
+  }
+
+  .reminder-delete-footer {
+    flex-direction: column-reverse;
+  }
+
+  .reminder-delete-footer button {
+    width: 100%;
   }
 }

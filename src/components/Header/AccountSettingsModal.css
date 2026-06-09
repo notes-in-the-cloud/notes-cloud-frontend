@@ -1,0 +1,170 @@
+.account-settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3.5rem 1rem 2rem;
+  overflow-y: auto;
+  animation: accountSettingsFadeIn 0.18s ease;
+}
+
+.account-settings-modal {
+  width: 100%;
+  max-width: 30rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 1.45rem;
+  color: var(--text);
+  animation: accountSettingsScaleIn 0.2s ease;
+}
+
+@keyframes accountSettingsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes accountSettingsScaleIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.account-settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.account-settings-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.account-settings-title h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.3rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.account-settings-title p {
+  color: var(--textMuted);
+  font-size: 0.84rem;
+  margin-top: 0.15rem;
+}
+
+.account-settings-close {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  color: var(--textMuted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.account-settings-close:hover {
+  color: var(--text);
+  border-color: var(--borderLight);
+}
+
+.account-settings-state,
+.account-settings-error {
+  border-radius: 0.65rem;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.account-settings-state {
+  color: var(--textMuted);
+  background: var(--card);
+  border: 1px dashed var(--border);
+}
+
+.account-settings-error {
+  color: var(--error);
+  background: var(--errorDim);
+  border: 1px solid var(--error);
+  margin-bottom: 0.9rem;
+}
+
+.account-settings-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.account-settings-field {
+  display: grid;
+  gap: 0.28rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  padding: 0.8rem 0.9rem;
+  min-width: 0;
+}
+
+.account-settings-label {
+  color: var(--textMuted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.account-settings-value {
+  color: var(--text);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.account-settings-password {
+  letter-spacing: 0.08em;
+}
+
+.account-settings-mono {
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.82rem;
+}
+
+.account-settings-help {
+  color: var(--textMuted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.account-settings-pill {
+  width: fit-content;
+  color: var(--amber);
+  background: var(--amberDim);
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.account-settings-pill--ok {
+  color: var(--success);
+  background: var(--successDim);
+}
+
+@media (max-width: 560px) {
+  .account-settings-backdrop {
+    padding: 1rem;
+  }
+
+  .account-settings-modal {
+    padding: 1.15rem;
+  }
+}
