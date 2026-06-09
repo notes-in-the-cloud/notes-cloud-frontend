@@ -119,13 +119,6 @@ export default function AccountSettingsModal({ userName, userAvatar, onClose }: 
               </div>
 
               <div className="account-settings-field">
-                <span className="account-settings-label">User ID</span>
-                <span className="account-settings-value account-settings-mono">
-                  {account?.id || session?.userId || 'Not available'}
-                </span>
-              </div>
-
-              <div className="account-settings-field">
                 <span className="account-settings-label">Created</span>
                 <span className="account-settings-value">{formatDate(account?.createdAt)}</span>
               </div>

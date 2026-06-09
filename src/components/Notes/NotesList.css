@@ -214,3 +214,133 @@
   font-size: 0.875rem;
   gap: 0.5rem;
 }
+
+.note-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.note-delete-modal {
+  width: 100%;
+  max-width: 27rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  padding: 1.4rem;
+  animation: noteDeleteScaleIn 0.18s ease;
+}
+
+@keyframes noteDeleteScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.note-delete-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 0.8rem;
+  background: var(--errorDim);
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.note-delete-content h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--text);
+  margin: 0 0 0.45rem;
+}
+
+.note-delete-content p {
+  color: var(--textMuted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.note-delete-content strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.note-delete-note {
+  margin-top: 0.65rem !important;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+}
+
+.note-delete-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.note-delete-secondary,
+.note-delete-danger {
+  border-radius: 0.55rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  white-space: nowrap;
+}
+
+.note-delete-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--textMuted);
+}
+
+.note-delete-secondary:hover:not(:disabled) {
+  background: var(--card);
+  color: var(--text);
+}
+
+.note-delete-danger {
+  background: var(--error);
+  border: 1px solid var(--error);
+  color: white;
+}
+
+.note-delete-danger:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.note-delete-secondary:disabled,
+.note-delete-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .note-delete-footer {
+    flex-direction: column-reverse;
+  }
+
+  .note-delete-footer button {
+    width: 100%;
+  }
+}

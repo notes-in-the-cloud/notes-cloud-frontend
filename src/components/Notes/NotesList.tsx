@@ -4,6 +4,7 @@ import { fetchNotes, createNote, updateNote, deleteNote } from '../../api/notes'
 import NoteCard from './NoteCard';
 import NoteDetail from './NoteDetail';
 import NoteEditor from './NoteEditor';
+import NoteDeleteModal from './NoteDeleteModal';
 import './NotesList.css';
 
 export default function NotesList() {
@@ -19,17 +20,22 @@ export default function NotesList() {
 
   const [search, setSearch] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    fetchNotes()
-      .then(data => setNotes(data))
-      .catch(err => {
-        console.error('Failed to load notes:', err);
-        setError('Could not load notes. Make sure the notes service is running.');
-      })
-      .finally(() => setLoading(false));
+    const timeoutId = window.setTimeout(() => {
+      setLoading(true);
+      setError('');
+      fetchNotes()
+        .then(data => setNotes(data))
+        .catch(err => {
+          console.error('Failed to load notes:', err);
+          setError('Could not load notes. Make sure the notes service is running.');
+        })
+        .finally(() => setLoading(false));
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const filtered = notes.filter(n =>
@@ -76,18 +82,52 @@ export default function NotesList() {
     }
   }
 
-  async function handleDelete(id: string) {
+  function openDeleteModal(id: string) {
+    const note = notes.find(n => n.id === id) ?? (viewingNote?.id === id ? viewingNote : null);
+
+    if (!note) {
+      return;
+    }
+
+    setNoteToDelete(note);
+  }
+
+  function closeDeleteModal() {
+    if (deletingId) {
+      return;
+    }
+
+    setNoteToDelete(null);
+  }
+
+  async function handleDelete() {
+    if (!noteToDelete) {
+      return;
+    }
+
+    const id = noteToDelete.id;
+
     setDeletingId(id);
     try {
       await deleteNote(id);
       setNotes(prev => prev.filter(n => n.id !== id));
       if (viewingNote?.id === id) setViewingNote(null);
+      setNoteToDelete(null);
     } catch (err) {
       console.error('Failed to delete note:', err);
     } finally {
       setDeletingId(null);
     }
   }
+
+  const deleteModal = noteToDelete && (
+    <NoteDeleteModal
+      note={noteToDelete}
+      deleting={deletingId === noteToDelete.id}
+      onCancel={closeDeleteModal}
+      onConfirm={handleDelete}
+    />
+  );
 
   if (viewingNote) {
     return (
@@ -96,7 +136,7 @@ export default function NotesList() {
           note={viewingNote}
           onBack={() => setViewingNote(null)}
           onEdit={(note) => { openEdit(note); }}
-          onDelete={handleDelete}
+          onDelete={openDeleteModal}
         />
 
         {showEditor && (
@@ -108,6 +148,8 @@ export default function NotesList() {
             onClose={closeEditor}
           />
         )}
+
+        {deleteModal}
       </div>
     );
   }
@@ -170,7 +212,7 @@ export default function NotesList() {
               deletingId={deletingId}
               onView={setViewingNote}
               onEdit={openEdit}
-              onDelete={handleDelete}
+              onDelete={openDeleteModal}
             />
           ))}
         </div>
@@ -185,6 +227,8 @@ export default function NotesList() {
           onClose={closeEditor}
         />
       )}
+
+      {deleteModal}
     </div>
   );
 }

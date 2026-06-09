@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Notification, NotificationPayload } from '../types';
 import * as api from '../api/notifications';
 import { fetchReminderById, updateReminder } from '../api/reminders';
@@ -19,9 +19,12 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
   const [unreadNotifications, setUnreadNotifications] = useState<Notification[]>([]);
   const [toasts, setToasts] = useState<Notification[]>([]);
   const [tab, setTab] = useState<NotifTab>('all');
+  const knownNotificationIds = useRef<Set<string>>(new Set());
+  const hasLoadedNotifications = useRef(false);
 
   const displayed = tab === 'all' ? allNotifications : unreadNotifications;
   const allCount = allNotifications.length;
+  const latestNotification = unreadNotifications[0] ?? allNotifications[0] ?? null;
 
   const refreshNotifications = useCallback(async () => {
     if (!resolvedUserId) {
@@ -32,10 +35,20 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
       const notifications = await api.fetchNotifications();
       const sorted = sortNotifications(notifications);
       const unread = sorted.filter(n => !n.read);
+      const newUnread = hasLoadedNotifications.current
+        ? unread.filter(n => !knownNotificationIds.current.has(n.id))
+        : [];
 
       setAllNotifications(sorted);
       setUnreadNotifications(unread);
       setUnreadCount(unread.length);
+
+      if (newUnread.length > 0) {
+        setToasts(prev => mergeNotifications(prev, newUnread));
+      }
+
+      knownNotificationIds.current = new Set(sorted.map(n => n.id));
+      hasLoadedNotifications.current = true;
     } catch (error) {
       console.error('Failed to load notifications:', error);
 
@@ -65,6 +78,29 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
       return () => window.clearTimeout(timeoutId);
     }
   }, [isOpen, refreshNotifications]);
+
+  useEffect(() => {
+    if (!resolvedUserId) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      void refreshNotifications();
+    }, 3000);
+
+    function refreshWhenVisible() {
+      if (!document.hidden) {
+        void refreshNotifications();
+      }
+    }
+
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, [refreshNotifications, resolvedUserId]);
 
   useEffect(() => {
     if (!resolvedUserId) {
@@ -113,6 +149,9 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
             readAt: null,
             firedAt: payload.firedAt,
           };
+
+          knownNotificationIds.current.add(notif.id);
+          hasLoadedNotifications.current = true;
 
           setAllNotifications(prev => upsertNotification(prev, notif));
           setUnreadNotifications(prev => {
@@ -220,6 +259,7 @@ export function useNotifications(userId: string | null, isOpen: boolean) {
     displayed,
     unreadCount,
     allCount,
+    latestNotification,
     tab,
     setTab,
     toasts,
@@ -242,6 +282,16 @@ function upsertNotification(
 ): Notification[] {
   const withoutCurrent = notifications.filter(n => n.id !== notification.id);
   return sortNotifications([notification, ...withoutCurrent]);
+}
+
+function mergeNotifications(
+  notifications: Notification[],
+  incoming: Notification[],
+): Notification[] {
+  return incoming.reduce(
+    (next, notification) => upsertNotification(next, notification),
+    notifications,
+  );
 }
 
 function getNotificationPayload(
