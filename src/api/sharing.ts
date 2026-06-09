@@ -62,7 +62,7 @@ export function extractToken(response: ShareLinkResponse | string): string {
 }
 
 export function buildFrontendShareUrl(token: string): string {
-  return `${window.location.origin}/?share=${token}`;
+  return `${window.location.origin}/shared/${encodeURIComponent(token)}`;
 }
 
 function extractTokenFromUrl(url: string): string {

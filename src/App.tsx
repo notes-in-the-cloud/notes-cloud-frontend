@@ -3,6 +3,7 @@ import './App.css';
 import LogIn from './components/Auth/LogIn';
 import SignUp from './components/Auth/SignUp';
 import Notes from './components/Notes/Notes';
+import SharedNoteView from './components/Notes/SharedNoteView';
 import EmailCodeVerify from './components/Auth/EmailCodeVerify';
 import { loadSession, saveSession } from './components/Auth/Session';
 import type { Page } from './types';
@@ -20,6 +21,7 @@ function getCookie(name: string): string | null {
 }
 
 function App() {
+  const sharedToken = getSharedTokenFromUrl();
   const [page, setPage] = useState<Page>(() => loadSession() ? 'notes' : 'login');
   const [loginEmail, setLoginEmail] = useState('');
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -29,6 +31,10 @@ function App() {
 
   // Check for OAuth redirect on mount
   useEffect(() => {
+    if (sharedToken) {
+      return;
+    }
+
     // Check for OAuth errors first
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
@@ -65,12 +71,12 @@ function App() {
         window.history.replaceState({}, document.title, window.location.pathname);
 
         // Navigate to notes
-        setPage('notes');
+        window.setTimeout(() => setPage('notes'), 0);
       } catch (error) {
         console.error('Failed to parse OAuth token:', error);
       }
     }
-  }, []);
+  }, [sharedToken]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
@@ -84,12 +90,13 @@ function App() {
 
   return (
     <>
-      {page === 'login' && <LogIn onNavigate={setPage} />}
-      {page === 'register' && <SignUp onNavigate={setPage} onEmailSubmit={handleEmailSubmit} />}
-      {page === 'verify-email' && (
+      {sharedToken && <SharedNoteView token={sharedToken} />}
+      {!sharedToken && page === 'login' && <LogIn onNavigate={setPage} />}
+      {!sharedToken && page === 'register' && <SignUp onNavigate={setPage} onEmailSubmit={handleEmailSubmit} />}
+      {!sharedToken && page === 'verify-email' && (
         <EmailCodeVerify email={loginEmail} onNavigate={setPage} />
       )}
-      {page === 'notes' && (
+      {!sharedToken && page === 'notes' && (
         <Notes
           onNavigate={setPage}
           darkMode={darkMode}
@@ -98,6 +105,23 @@ function App() {
       )}
     </>
   );
+}
+
+function getSharedTokenFromUrl(): string {
+  const params = new URLSearchParams(window.location.search);
+  const queryToken = params.get('share');
+
+  if (queryToken) {
+    return queryToken;
+  }
+
+  const [, route, token] = window.location.pathname.split('/');
+
+  if ((route === 'shared' || route === 'public') && token) {
+    return decodeURIComponent(token);
+  }
+
+  return '';
 }
 
 export default App;

@@ -34,6 +34,10 @@ export default function HeaderBar({
     const [userInfo, setUserInfo] = useState<{ displayName: string; email: string } | null>(null);
     const [loadingUser, setLoadingUser] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const storedName = localStorage.getItem('userName') ?? '';
+    const fallbackEmail = localStorage.getItem('email') ?? '';
+    const fallbackName = userName === 'User' ? storedName || fallbackEmail : userName;
+    const avatarName = userInfo?.displayName || fallbackName || 'User';
 
 
     useEffect(() => {
@@ -46,9 +50,9 @@ export default function HeaderBar({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [menuOpen]);
 
-    // Fetch user data when menu opens
+    // Fetch user data so the avatar can show real user initials.
     useEffect(() => {
-        if (!menuOpen || userInfo || loadingUser) {
+        if (userInfo || loadingUser) {
             return;
         }
 
@@ -57,6 +61,8 @@ export default function HeaderBar({
             me()
                 .then(user => {
                     setUserInfo({ displayName: user.displayName, email: user.email });
+                    localStorage.setItem('userName', user.displayName);
+                    localStorage.setItem('email', user.email);
                 })
                 .catch(err => {
                     console.error('Failed to fetch user profile:', err);
@@ -67,7 +73,7 @@ export default function HeaderBar({
         }, 0);
 
         return () => window.clearTimeout(timeoutId);
-    }, [menuOpen, userInfo, loadingUser]);
+    }, [userInfo, loadingUser]);
 
     const handleLogOut = () => {
         localStorage.removeItem('userId');
@@ -122,15 +128,15 @@ export default function HeaderBar({
                         aria-expanded={menuOpen}
                         onClick={() => setMenuOpen(o => !o)}
                     >
-                        <Avatar name={userName} src={userAvatar} size={36} />
+                        <Avatar name={avatarName} src={userAvatar} size={36} />
                     </button>
 
                     {menuOpen && (
                         <div className="avatar-dropdown">
                             <div className="avatar-dropdown-user">
-                                <Avatar name={userInfo?.displayName || userName} src={userAvatar} size={32} />
+                                <Avatar name={avatarName} src={userAvatar} size={32} />
                                 <div className="avatar-dropdown-user-info">
-                                    <span className="avatar-dropdown-name">{userInfo?.displayName || userName}</span>
+                                    <span className="avatar-dropdown-name">{avatarName}</span>
                                     {loadingUser && <span className="avatar-dropdown-email">Loading...</span>}
                                     {userInfo?.email && <span className="avatar-dropdown-email">{userInfo.email}</span>}
                                 </div>
