@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import Avatar from "../../Avatar"
 import './HeaderBar.css';
-import { me } from '../../api/auth';
+import { logout, me } from '../../api/auth';
+import { clearSession } from '../Auth/Session';
 
 interface Props{
     userName?:string;
@@ -27,16 +28,14 @@ export default function HeaderBar({
   onReminders,
   onTodos,
   onSettings,
-  darkMode = true,
+  darkMode = false,
   onToggleTheme
 }: Props) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [userInfo, setUserInfo] = useState<{ displayName: string; email: string } | null>(null);
     const [loadingUser, setLoadingUser] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
-    const storedName = localStorage.getItem('userName') ?? '';
-    const fallbackEmail = localStorage.getItem('email') ?? '';
-    const fallbackName = userName === 'User' ? storedName || fallbackEmail : userName;
+    const fallbackName = userName === 'User' ? '' : userName;
     const avatarName = userInfo?.displayName || fallbackName || 'User';
 
 
@@ -61,8 +60,6 @@ export default function HeaderBar({
             me()
                 .then(user => {
                     setUserInfo({ displayName: user.displayName, email: user.email });
-                    localStorage.setItem('userName', user.displayName);
-                    localStorage.setItem('email', user.email);
                 })
                 .catch(err => {
                     console.error('Failed to fetch user profile:', err);
@@ -75,11 +72,17 @@ export default function HeaderBar({
         return () => window.clearTimeout(timeoutId);
     }, [userInfo, loadingUser]);
 
-    const handleLogOut = () => {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('userName');
+    const handleLogOut = async () => {
         setMenuOpen(false);
-        onLogOut();
+
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Logout failed:', error);
+        } finally {
+            clearSession();
+            onLogOut();
+        }
     };
 
     return (
@@ -168,7 +171,7 @@ export default function HeaderBar({
                                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                                     )}
                                 </svg>
-                                {darkMode ? 'Dark mode' : 'Light mode'}
+                                {darkMode ? 'Light mode' : 'Dark mode'}
                             </button>
                             <div className="avatar-dropdown-divider" />
 

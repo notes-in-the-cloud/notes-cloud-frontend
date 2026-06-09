@@ -1,5 +1,5 @@
 import { logout } from '../../api/auth';
-import { clearTokens } from '../../api/config';
+import { clearSession } from './Session';
 
 export default function LogOut({ onConfirm }: { onConfirm: () => void }) {
   const handleLogOut = async () => {
@@ -7,9 +7,9 @@ export default function LogOut({ onConfirm }: { onConfirm: () => void }) {
       // Call logout API - backend will clear refresh_token cookie
       await logout();
     } catch (error) {
-      // Even if logout API fails, still clear local tokens
       console.error('Logout API failed:', error);
-      clearTokens();
+    } finally {
+      clearSession();
     }
 
     // Notify parent component

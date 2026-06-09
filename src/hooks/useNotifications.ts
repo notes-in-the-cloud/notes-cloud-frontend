@@ -3,6 +3,7 @@ import type { Notification, NotificationPayload } from '../types';
 import * as api from '../api/notifications';
 import { fetchReminderById, updateReminder } from '../api/reminders';
 import { createReminderSocket } from '../api/ws';
+import { getAccessToken } from '../api/config';
 
 export type NotifTab = 'all' | 'unread';
 
@@ -322,7 +323,7 @@ function isGatewaySocketMessage(
 }
 
 function getUserIdFromToken(): string | null {
-  const token = localStorage.getItem('accessToken');
+  const token = getAccessToken();
 
   if (!token) {
     return null;
