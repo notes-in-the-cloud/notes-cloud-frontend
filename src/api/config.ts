@@ -38,6 +38,7 @@ export class ApiError extends Error {
 }
 
 let memoryAccessToken: string | null = null;
+let refreshBlocked = false;
 
 export function getAccessToken(): string | null {
   return memoryAccessToken;
@@ -68,11 +69,17 @@ export function getRefreshToken(): string | null {
 
 export function saveTokens(accessToken: string): void {
   memoryAccessToken = accessToken;
+  refreshBlocked = false;
 }
 
 export function clearTokens(): void {
   memoryAccessToken = null;
+  refreshBlocked = true;
   clearLegacyStoredClientData();
+}
+
+export function canAttemptRefresh(): boolean {
+  return !refreshBlocked;
 }
 
 export function clearLegacyStoredClientData(): void {
@@ -93,6 +100,10 @@ let isRefreshing = false;
 let refreshPromise: Promise<string> | null = null;
 
 async function refreshAccessToken(): Promise<string> {
+  if (!canAttemptRefresh()) {
+    throw new Error('Token refresh is blocked until the next login');
+  }
+
   // If already refreshing, wait for that promise
   if (isRefreshing && refreshPromise) {
     return refreshPromise;
@@ -111,9 +122,7 @@ async function refreshAccessToken(): Promise<string> {
       });
 
       if (!res.ok) {
-        // If refresh fails, clear tokens and redirect to login
         clearTokens();
-        window.location.href = '/'; // Redirect to login page
         throw new Error('Token refresh failed');
       }
 
@@ -125,6 +134,7 @@ async function refreshAccessToken(): Promise<string> {
       const newAccessToken = data.token || data;
 
       if (!newAccessToken || typeof newAccessToken !== 'string') {
+        clearTokens();
         throw new Error('Invalid token response');
       }
 
@@ -198,7 +208,7 @@ export async function fetchWithAuth(
   // If unauthorized and we have a refresh token cookie, try to refresh
   if (response.status === 401) {
     // Only attempt refresh if this isn't already a refresh request
-    if (!url.includes('/auth/refresh')) {
+    if (!url.includes('/auth/refresh') && canAttemptRefresh()) {
       try {
         // Get new access token (refresh token sent automatically in cookie)
         const newAccessToken = await refreshAccessToken();

@@ -20,6 +20,10 @@ function getCookie(name: string): string | null {
   return null;
 }
 
+function clearCookie(name: string): void {
+  document.cookie = `${name}=; Max-Age=0; path=/`;
+}
+
 function App() {
   const sharedToken = getSharedTokenFromUrl();
   const initialSession = loadSession();
@@ -86,6 +90,8 @@ function App() {
         return;
       } catch (error) {
         console.error('Failed to parse OAuth token:', error);
+      } finally {
+        clearCookie('access_token');
       }
     }
 
@@ -158,6 +164,10 @@ function App() {
 function createSessionFromAccessToken(accessToken: string) {
   const payload = parseJwtPayload(accessToken);
 
+  if (!payload) {
+    throw new Error('Invalid access token');
+  }
+
   return {
     userId: payload.userId || payload.sub || '',
     userName: payload.name || payload.displayName || '',
@@ -167,11 +177,20 @@ function createSessionFromAccessToken(accessToken: string) {
   };
 }
 
-function parseJwtPayload(accessToken: string): Record<string, string> {
+function parseJwtPayload(accessToken: string): Record<string, string> | null {
   try {
-    return JSON.parse(atob(accessToken.split('.')[1])) as Record<string, string>;
+    const [, payload] = accessToken.split('.');
+
+    if (!payload) {
+      return null;
+    }
+
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+
+    return JSON.parse(atob(padded)) as Record<string, string>;
   } catch {
-    return {};
+    return null;
   }
 }
 
