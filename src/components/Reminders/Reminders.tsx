@@ -14,6 +14,7 @@ import ReminderCard from './RemindersCard';
 import ReminderGroup from './ReminderGroup';
 import ReminderEditorModal from './RemindersEdit';
 import ReminderEmptyState from './RemindersEmpty';
+import ReminderDeleteModal from './ReminderDeleteModal';
 
 import './Reminders.css';
 
@@ -30,6 +31,7 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [reminderToDelete, setReminderToDelete] = useState<Reminder | null>(null);
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,15 +46,19 @@ export default function RemindersPage({ onBack, openReminderId }: Props) {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    fetchReminders()
-      .then(setReminders)
-      .catch(err => {
-        console.error('Failed to load reminders:', err);
-        setError('Could not load reminders.');
-      })
-      .finally(() => setLoading(false));
+    const timeoutId = window.setTimeout(() => {
+      setLoading(true);
+      setError('');
+      fetchReminders()
+        .then(setReminders)
+        .catch(err => {
+          console.error('Failed to load reminders:', err);
+          setError('Could not load reminders.');
+        })
+        .finally(() => setLoading(false));
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
 useEffect(()=>{
@@ -153,14 +159,37 @@ useEffect(()=>{
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Delete this reminder?')) 
+  function openDeleteModal(id: string) {
+    const reminder = reminders.find(r => r.id === id);
+
+    if (!reminder) {
       return;
+    }
+
+    setReminderToDelete(reminder);
+  }
+
+  function closeDeleteModal() {
+    if (deletingId) {
+      return;
+    }
+
+    setReminderToDelete(null);
+  }
+
+  async function handleDelete() {
+    if (!reminderToDelete) {
+      return;
+    }
+
+    const id = reminderToDelete.id;
+
     setDeletingId(id);
     try {
       await deleteReminder(id);
       setReminders(prev => prev.filter(r => r.id !== id));
       if (editingId === id) closeForm();
+      setReminderToDelete(null);
     } catch (err) {
       console.error('Failed to delete reminder:', err);
     } finally {
@@ -216,7 +245,7 @@ useEffect(()=>{
     now, togglingId, deletingId,
     onOpenEdit: openEdit,
     onToggleComplete: handleToggleComplete,
-    onDelete: handleDelete,
+    onDelete: openDeleteModal,
   };
 
   const isEmpty = activeTab === 'all'
@@ -297,7 +326,16 @@ useEffect(()=>{
           setForm={setForm}
           onSubmit={handleSubmit}
           onClose={closeForm}
-          onDelete={editingId ? () => handleDelete(editingId) : undefined}
+          onDelete={editingId ? () => openDeleteModal(editingId) : undefined}
+        />
+      )}
+
+      {reminderToDelete && (
+        <ReminderDeleteModal
+          reminder={reminderToDelete}
+          deleting={deletingId === reminderToDelete.id}
+          onCancel={closeDeleteModal}
+          onConfirm={handleDelete}
         />
       )}
     </div>

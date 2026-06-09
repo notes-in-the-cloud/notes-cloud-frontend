@@ -8,6 +8,7 @@ import { useNotifications } from '../../hooks/useNotifications';
 import { loadSession } from '../Auth/Session';
 import type { Page } from '../../types';
 import TodosPage from '../Todos/Todos';
+import AccountSettingsModal from '../Header/AccountSettingsModal';
 
 interface Props {
   onNavigate: (page: Page) => void;
@@ -18,6 +19,7 @@ interface Props {
 export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const [showReminders, setShowReminders] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [openReminderId, setOpenReminderId] = useState<string | undefined>(undefined);
 
   const session = useMemo(() => loadSession(), []);
@@ -67,6 +69,7 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
 
           setShowNotifications(prev => !prev);
         }}
+        onSettings={() => setShowSettings(true)}
         notifCount={unreadCount}
         darkMode={darkMode}
         onToggleTheme={onToggleTheme}
@@ -101,6 +104,13 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
         onDismiss={dismissToast}
         onComplete={completeFromToast}
       />
+
+      {showSettings && (
+        <AccountSettingsModal
+          userName={userName}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </div>
   );
 }
