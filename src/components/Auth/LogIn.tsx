@@ -12,7 +12,7 @@ interface Props {
 
 export default function LogIn({ onNavigate }: Props) {
   const [serverError, setServerError] = useState('');
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginData>();
+  const { register, handleSubmit } = useForm<LoginData>();
 
   //connect with backend
   function handleOAuth(provider: 'google' | 'gitlab') {
@@ -33,7 +33,7 @@ export default function LogIn({ onNavigate }: Props) {
         password: data.password,
       });
 
-      // login() already saves access token to localStorage
+      // login() keeps the access token in memory; refresh token stays in httpOnly cookie.
       // Extract userId from JWT payload
       try {
         const payload = JSON.parse(atob(accessToken.token.split('.')[1]));
@@ -118,11 +118,10 @@ export default function LogIn({ onNavigate }: Props) {
             <label className="auth-label">Email</label>
             <input
               className="auth-input"
-              type="email"
+              type="text"
               placeholder="email@example.com"
-              {...register('email', { required: true })}
+              {...register('email')}
             />
-            {errors.email && <span className="auth-error">Email is required.</span>}
           </div>
 
           <div className="auth-field">
@@ -131,9 +130,8 @@ export default function LogIn({ onNavigate }: Props) {
               className="auth-input"
               type="password"
               placeholder="Enter password"
-              {...register('password', { required: true })}
+              {...register('password')}
             />
-            {errors.password && <span className="auth-error">Password is required.</span>}
           </div>
 
           <button className="auth-btn" type="submit">Log in</button>

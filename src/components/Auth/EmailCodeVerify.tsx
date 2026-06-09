@@ -19,11 +19,6 @@ export default function EmailCodeVerify({ email, onNavigate }: Props) {
     e.preventDefault();
     setServerError('');
 
-    if (!verificationCode.trim()) {
-      setServerError('Please enter the verification code.');
-      return;
-    }
-
     try {
       await verifyEmail({ verificationCode: verificationCode.trim() });
       setSuccessMessage('Email verified successfully! Redirecting to login...');
@@ -101,7 +96,7 @@ export default function EmailCodeVerify({ email, onNavigate }: Props) {
             />
           </div>
 
-          <button className="auth-btn" type="submit" disabled={!verificationCode.trim()}>
+          <button className="auth-btn" type="submit">
             Verify
           </button>
         </form>

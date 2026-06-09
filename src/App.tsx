@@ -6,9 +6,9 @@ import Notes from './components/Notes/Notes';
 import SharedNoteView from './components/Notes/SharedNoteView';
 import EmailCodeVerify from './components/Auth/EmailCodeVerify';
 import { loadSession, saveSession } from './components/Auth/Session';
+import { refresh } from './api/auth';
+import { clearLegacyStoredClientData } from './api/config';
 import type { Page } from './types';
-
-const THEME_KEY = 'darkMode';
 
 // Helper to get cookie value
 function getCookie(name: string): string | null {
@@ -22,18 +22,28 @@ function getCookie(name: string): string | null {
 
 function App() {
   const sharedToken = getSharedTokenFromUrl();
+  const initialSession = loadSession();
   const [page, setPage] = useState<Page>(() => loadSession() ? 'notes' : 'login');
+  const [authChecking, setAuthChecking] = useState(() => !sharedToken && !initialSession);
   const [loginEmail, setLoginEmail] = useState('');
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const stored = localStorage.getItem(THEME_KEY);
-    return stored === null ? true : stored === 'true';
-  });
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    clearLegacyStoredClientData();
+  }, []);
 
   // Check for OAuth redirect on mount
   useEffect(() => {
     if (sharedToken) {
       return;
     }
+
+    if (loadSession()) {
+      window.setTimeout(() => setAuthChecking(false), 0);
+      return;
+    }
+
+    let active = true;
 
     // Check for OAuth errors first
     const urlParams = new URLSearchParams(window.location.search);
@@ -47,6 +57,11 @@ function App() {
       // Display error (you might want to show this in a toast/alert)
       console.error('OAuth error:', error, errorMessage);
       alert(errorMessage || 'Authentication failed. Please try again.');
+      window.setTimeout(() => {
+        if (active) {
+          setAuthChecking(false);
+        }
+      }, 0);
       return;
     }
 
@@ -56,31 +71,51 @@ function App() {
     if (accessTokenCookie && !loadSession()) {
       // User just completed OAuth, extract info from token
       try {
-        const payload = JSON.parse(atob(accessTokenCookie.split('.')[1]));
-
-        // Save session
-        saveSession({
-          userId: payload.userId || payload.sub || '',
-          userName: payload.name || '',
-          email: payload.email || '',
-          accessToken: accessTokenCookie,
-          refreshToken: '', // In httpOnly cookie
-        });
+        saveSession(createSessionFromAccessToken(accessTokenCookie));
 
         // Clear any success indicator from URL
         window.history.replaceState({}, document.title, window.location.pathname);
 
         // Navigate to notes
-        window.setTimeout(() => setPage('notes'), 0);
+        window.setTimeout(() => {
+          if (active) {
+            setPage('notes');
+            setAuthChecking(false);
+          }
+        }, 0);
+        return;
       } catch (error) {
         console.error('Failed to parse OAuth token:', error);
       }
     }
+
+    refresh()
+      .then(accessToken => {
+        if (!active) {
+          return;
+        }
+
+        saveSession(createSessionFromAccessToken(accessToken.token));
+        setPage('notes');
+      })
+      .catch(() => {
+        if (active) {
+          setPage('login');
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setAuthChecking(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, [sharedToken]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem(THEME_KEY, String(darkMode));
   }, [darkMode]);
 
   function handleEmailSubmit(email: string) {
@@ -91,12 +126,25 @@ function App() {
   return (
     <>
       {sharedToken && <SharedNoteView token={sharedToken} />}
-      {!sharedToken && page === 'login' && <LogIn onNavigate={setPage} />}
-      {!sharedToken && page === 'register' && <SignUp onNavigate={setPage} onEmailSubmit={handleEmailSubmit} />}
-      {!sharedToken && page === 'verify-email' && (
+      {!sharedToken && authChecking && (
+        <div className="auth-wrapper">
+          <div className="auth-card">
+            <div className="auth-brand">
+              <svg className="auth-brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+              </svg>
+              <span className="auth-brand-name">Notes Cloud</span>
+            </div>
+            <p className="auth-subtitle">Restoring session...</p>
+          </div>
+        </div>
+      )}
+      {!sharedToken && !authChecking && page === 'login' && <LogIn onNavigate={setPage} />}
+      {!sharedToken && !authChecking && page === 'register' && <SignUp onNavigate={setPage} onEmailSubmit={handleEmailSubmit} />}
+      {!sharedToken && !authChecking && page === 'verify-email' && (
         <EmailCodeVerify email={loginEmail} onNavigate={setPage} />
       )}
-      {!sharedToken && page === 'notes' && (
+      {!sharedToken && !authChecking && page === 'notes' && (
         <Notes
           onNavigate={setPage}
           darkMode={darkMode}
@@ -105,6 +153,26 @@ function App() {
       )}
     </>
   );
+}
+
+function createSessionFromAccessToken(accessToken: string) {
+  const payload = parseJwtPayload(accessToken);
+
+  return {
+    userId: payload.userId || payload.sub || '',
+    userName: payload.name || payload.displayName || '',
+    email: payload.email || '',
+    accessToken,
+    refreshToken: '',
+  };
+}
+
+function parseJwtPayload(accessToken: string): Record<string, string> {
+  try {
+    return JSON.parse(atob(accessToken.split('.')[1])) as Record<string, string>;
+  } catch {
+    return {};
+  }
 }
 
 function getSharedTokenFromUrl(): string {

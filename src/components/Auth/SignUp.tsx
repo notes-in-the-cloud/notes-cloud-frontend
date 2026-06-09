@@ -12,7 +12,7 @@ interface Props {
 
 export default function SignUp({ onNavigate, onEmailSubmit }: Props) {
   const [serverError, setServerError] = useState('');
-  const { register, handleSubmit, formState: { errors } } = useForm<SignUpData>();
+  const { register, handleSubmit } = useForm<SignUpData>();
 
   const onSubmit = async (data: SignUpData) => {
     setServerError('');
@@ -65,20 +65,18 @@ export default function SignUp({ onNavigate, onEmailSubmit }: Props) {
               className="auth-input"
               type="text"
               placeholder="Your name"
-              {...register('name', { required: true })}
+              {...register('name')}
             />
-            {errors.name && <span className="auth-error">Name is required.</span>}
           </div>
 
           <div className="auth-field">
             <label className="auth-label">Email</label>
             <input
               className="auth-input"
-              type="email"
+              type="text"
               placeholder="email@example.com"
-              {...register('email', { required: true })}
+              {...register('email')}
             />
-            {errors.email && <span className="auth-error">Email is required.</span>}
           </div>
 
           <div className="auth-field">
@@ -87,10 +85,8 @@ export default function SignUp({ onNavigate, onEmailSubmit }: Props) {
               className="auth-input"
               type="password"
               placeholder="••••••••"
-              {...register('password', { required: true, minLength: 6 })}
+              {...register('password')}
             />
-            {errors.password?.type === 'required' && <span className="auth-error">Password is required.</span>}
-            {errors.password?.type === 'minLength' && <span className="auth-error">Password must be at least 6 characters.</span>}
           </div>
 
           <button className="auth-btn" type="submit">Create account</button>

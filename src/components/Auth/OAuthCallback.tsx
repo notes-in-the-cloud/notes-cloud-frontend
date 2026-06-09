@@ -18,7 +18,9 @@ export default function OAuthCallback({ onNavigate, onSuccess }: Props) {
     // Check for error first
     const errorParam = params.get('error');
     if (errorParam) {
-      setError(errorParam || 'OAuth authentication failed');
+      window.setTimeout(() => {
+        setError(errorParam || 'OAuth authentication failed');
+      }, 0);
       setTimeout(() => onNavigate('login'), 3000);
       return;
     }
@@ -28,14 +30,12 @@ export default function OAuthCallback({ onNavigate, onSuccess }: Props) {
 
     // For now, check if tokens are in query params (backend might set them)
     const accessToken = params.get('access_token') || params.get('accessToken');
-    const refreshToken = params.get('refresh_token') || params.get('refreshToken');
     const userId = params.get('user_id') || params.get('userId');
     const userName = params.get('user_name') || params.get('userName') || params.get('name');
     const email = params.get('email');
 
-    if (accessToken && refreshToken) {
-      // Save tokens
-      saveTokens(accessToken, refreshToken);
+    if (accessToken) {
+      saveTokens(accessToken);
 
       // Extract user info from JWT if not provided
       if (!userId || !userName || !email) {
@@ -57,7 +57,9 @@ export default function OAuthCallback({ onNavigate, onSuccess }: Props) {
       onNavigate('notes');
     } else {
       // No tokens found, might be processing or error
-      setError('Authentication in progress...');
+      window.setTimeout(() => {
+        setError('Authentication in progress...');
+      }, 0);
     }
   }, [onNavigate, onSuccess]);
 

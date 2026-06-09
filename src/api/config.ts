@@ -37,41 +37,10 @@ export class ApiError extends Error {
   }
 }
 
+let memoryAccessToken: string | null = null;
+
 export function getAccessToken(): string | null {
-  // Check direct token storage (used by Session.ts)
-  const directToken =
-    localStorage.getItem('accessToken') ??
-    localStorage.getItem('token') ??
-    localStorage.getItem('access_token');
-
-  if (directToken) {
-    return directToken;
-  }
-
-  // Check for tokenBundle structure (legacy support)
-  const rawTokenBundle = localStorage.getItem('tokenBundle');
-
-  if (!rawTokenBundle) {
-    return null;
-  }
-
-  try {
-    const tokenBundle = JSON.parse(rawTokenBundle);
-
-    // Handle nested accessToken object: {accessToken: {token: "...", tokenType: "...", ...}}
-    if (tokenBundle?.accessToken?.token && typeof tokenBundle.accessToken.token === 'string') {
-      return tokenBundle.accessToken.token;
-    }
-
-    // Handle flat accessToken string (legacy): {accessToken: "...", refreshToken: "..."}
-    if (typeof tokenBundle?.accessToken === 'string') {
-      return tokenBundle.accessToken;
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
+  return memoryAccessToken;
 }
 
 export function jsonHeaders(): HeadersInit {
@@ -94,30 +63,29 @@ export function authHeaders(): HeadersInit {
 }
 
 export function getRefreshToken(): string | null {
-  // Refresh token is now in httpOnly cookie, can't be accessed from JavaScript
-  // This function is kept for backward compatibility but will return null
-  return localStorage.getItem('refreshToken'); // Legacy support only
+  return null;
 }
 
-export function saveTokens(accessToken: string, refreshToken?: string): void {
-  localStorage.setItem('accessToken', accessToken);
-  // Don't store refresh token - it's in httpOnly cookie
-  // Only store if explicitly provided (legacy support)
-  if (refreshToken) {
-    localStorage.setItem('refreshToken', refreshToken);
-  }
+export function saveTokens(accessToken: string): void {
+  memoryAccessToken = accessToken;
 }
 
 export function clearTokens(): void {
+  memoryAccessToken = null;
+  clearLegacyStoredClientData();
+}
+
+export function clearLegacyStoredClientData(): void {
+  // Remove legacy persisted auth data from older builds.
   localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken'); // Legacy cleanup
+  localStorage.removeItem('refreshToken');
   localStorage.removeItem('token');
   localStorage.removeItem('access_token');
   localStorage.removeItem('tokenBundle');
   localStorage.removeItem('userId');
   localStorage.removeItem('userName');
   localStorage.removeItem('email');
-  // Note: httpOnly cookie will be cleared by backend on logout
+  localStorage.removeItem('darkMode');
 }
 
 // Track if we're currently refreshing to avoid multiple simultaneous refresh attempts
@@ -160,7 +128,7 @@ async function refreshAccessToken(): Promise<string> {
         throw new Error('Invalid token response');
       }
 
-      // Save only access token (refresh token is updated in cookie by backend)
+      // Keep access token in memory only. Refresh token stays in httpOnly cookie.
       saveTokens(newAccessToken);
 
       return newAccessToken;
