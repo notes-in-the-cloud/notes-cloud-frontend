@@ -20,7 +20,20 @@ interface Props {
   onUpdateList: (list: TodoListWithTasks, title: string) => void;
 }
 
-const PRIORITIES: TodoPriority[] = ['LOW', 'MEDIUM', 'HIGH'];
+const PRIORITIES: TodoPriority[] = ['HIGH', 'MEDIUM', 'LOW'];
+
+const PRIORITY_LABELS: Record<TodoPriority, string> = {
+  HIGH: 'High',
+  MEDIUM: 'Medium',
+  LOW: 'Low',
+};
+
+const FlagIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 21V5" />
+    <path d="M4 5c3-2 5 2 8 0s5 2 8 0v10c-3 2-5-2-8 0s-5-2-8 0" />
+  </svg>
+);
 
 function toDateInputValue(value: string | null): string {
   if (!value) {
@@ -114,16 +127,19 @@ export default function TodoEditModal({
               <div className="todos-modal-grid">
                 <div className="todos-field">
                   <label>Priority</label>
-                  <select
-                    value={taskPriority}
-                    onChange={e => setTaskPriority(e.target.value as TodoPriority)}
-                  >
+                  <div className="todo-priority-picker" role="group" aria-label="Task priority">
                     {PRIORITIES.map(priority => (
-                      <option key={priority} value={priority}>
-                        {priority}
-                      </option>
+                      <button
+                        key={priority}
+                        type="button"
+                        className={`todo-priority-pill todo-priority--${priority.toLowerCase()}${taskPriority === priority ? ' todo-priority-pill--active' : ''}`}
+                        onClick={() => setTaskPriority(priority)}
+                      >
+                        <FlagIcon />
+                        {PRIORITY_LABELS[priority]}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
                 <div className="todos-field">

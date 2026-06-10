@@ -35,6 +35,8 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   } = useNotifications(userId, showNotifications);
 
   function handleOpenReminder(reminderId: string) {
+    setShowNotifications(false);
+    setShowSettings(false);
     setShowTodos(false);
     setOpenReminderId(reminderId);
     setOpenReminderRequestKey(key => key + 1);
@@ -66,8 +68,8 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
           setShowReminders(true);
         }}
         onNotifications={() => {
-          if (!showNotifications && unreadCount > 0) {
-            setTab('unread');
+          if (!showNotifications) {
+            setTab(unreadCount > 0 ? 'unread' : 'all');
           }
 
           setShowNotifications(prev => !prev);

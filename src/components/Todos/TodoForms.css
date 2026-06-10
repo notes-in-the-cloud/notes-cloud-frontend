@@ -39,3 +39,51 @@
 .todos-field select:focus {
   border-color: var(--accent);
 }
+
+.todo-priority-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 2.45rem;
+  align-items: center;
+}
+
+.todo-priority-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2.15rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: transparent;
+  color: var(--textMuted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.todo-priority-pill:hover {
+  border-color: var(--borderLight);
+  color: var(--text);
+}
+
+.todo-priority-pill--active.todo-priority--high {
+  border-color: var(--high);
+  background: var(--highDim);
+  color: var(--high);
+}
+
+.todo-priority-pill--active.todo-priority--medium {
+  border-color: var(--yellow);
+  background: var(--yellowDim);
+  color: var(--yellow);
+}
+
+.todo-priority-pill--active.todo-priority--low {
+  border-color: var(--textMuted);
+  background: rgba(138, 133, 128, 0.15);
+  color: var(--text);
+}
