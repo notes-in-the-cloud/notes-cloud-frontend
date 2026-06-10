@@ -376,7 +376,7 @@
 
 .reminder-prio--urgent { background: var(--errorDim);   color: var(--error);     }
 .reminder-prio--high   { background: var(--amberDim);   color: var(--amber);     }
-.reminder-prio--medium { background: var(--amberDim);   color: var(--amber);     }
+.reminder-prio--medium { background: var(--yellowDim);  color: var(--yellow);    }
 .reminder-prio--low    { background: rgba(138, 133, 128, 0.15); color: var(--textMuted); }
 
 .reminders-empty {
@@ -643,7 +643,7 @@
 
 .reminder-form-pill--active.reminder-prio--urgent { border-color: var(--error);     background: var(--errorDim);   color: var(--error);     font-weight: 600; }
 .reminder-form-pill--active.reminder-prio--high   { border-color: var(--amber);     background: var(--amberDim);   color: var(--amber);     font-weight: 600; }
-.reminder-form-pill--active.reminder-prio--medium { border-color: var(--amber);     background: var(--amberDim);   color: var(--amber);     font-weight: 600; }
+.reminder-form-pill--active.reminder-prio--medium { border-color: var(--yellow);    background: var(--yellowDim);  color: var(--yellow);    font-weight: 600; }
 .reminder-form-pill--active.reminder-prio--low    { border-color: var(--textMuted); background: rgba(138, 133, 128, 0.15); color: var(--text); font-weight: 600; }
 
 .reminder-form-channels {
@@ -843,16 +843,6 @@
   border: 1px dashed var(--border);
   border-radius: 0.65rem;
   padding: 0.75rem;
-}
-
-.reminder-delete-label {
-  display: block;
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--textMuted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 1rem 0 0.35rem;
 }
 
 .reminder-delete-footer {

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { Reminder } from '../../types';
 import { Icon } from './Icons';
 
@@ -15,14 +14,10 @@ export default function ReminderDeleteModal({
   onCancel,
   onConfirm,
 }: Props) {
-  const [confirmation, setConfirmation] = useState('');
-  const expectedTitle = reminder.heading.trim();
-  const canDelete = confirmation.trim() === expectedTitle;
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (canDelete && !deleting) {
+    if (!deleting) {
       onConfirm();
     }
   }
@@ -40,22 +35,9 @@ export default function ReminderDeleteModal({
             You are about to delete <strong>{reminder.heading}</strong>.
           </p>
           <p className="reminder-delete-note">
-            Type the reminder title to confirm this action.
+            This action cannot be undone.
           </p>
         </div>
-
-        <label className="reminder-delete-label" htmlFor="reminder-delete-confirmation">
-          Reminder title
-        </label>
-        <input
-          id="reminder-delete-confirmation"
-          className="reminder-form-input"
-          value={confirmation}
-          onChange={e => setConfirmation(e.target.value)}
-          placeholder={reminder.heading}
-          autoFocus
-          disabled={deleting}
-        />
 
         <div className="reminder-delete-footer">
           <button
@@ -70,7 +52,8 @@ export default function ReminderDeleteModal({
           <button
             type="submit"
             className="reminder-form-btn reminder-form-btn--danger"
-            disabled={!canDelete || deleting}
+            disabled={deleting}
+            autoFocus
           >
             {deleting ? 'Deleting...' : 'Delete reminder'}
           </button>
