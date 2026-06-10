@@ -17,7 +17,7 @@ export default function TodoActionsCard({ onCreateTask, onCreateList }: Props) {
         </button>
 
         <button className="todos-primary-btn" onClick={onCreateTask}>
-          New task
+          Create task
         </button>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Reminder } from '../../types';
 import {
-  fetchReminders, createReminder, updateReminder, deleteReminder,
+  fetchReminders, fetchReminderById, createReminder, updateReminder, deleteReminder,
 } from '../../api/reminders';
 
 import {
@@ -75,13 +75,42 @@ useEffect(()=>{
   useEffect(() => {
     if (!openReminderId || loading) return;
     if (handledOpenRequestKey.current === openReminderRequestKey) return;
+    let active = true;
 
     const target = reminders.find(r => r.id === openReminderId);
 
     if (target) {
       handledOpenRequestKey.current = openReminderRequestKey;
       openEdit(target);
+      return;
     }
+
+    fetchReminderById(openReminderId)
+      .then(reminder => {
+        if (!active) {
+          return;
+        }
+
+        setReminders(prev => (
+          prev.some(r => r.id === reminder.id)
+            ? prev.map(r => (r.id === reminder.id ? reminder : r))
+            : [reminder, ...prev]
+        ));
+        handledOpenRequestKey.current = openReminderRequestKey;
+        openEdit(reminder);
+      })
+      .catch(err => {
+        if (!active) {
+          return;
+        }
+
+        console.error('Failed to open reminder from notification:', err);
+        setError('Could not open this reminder.');
+      });
+
+    return () => {
+      active = false;
+    };
   }, [openReminderId, openReminderRequestKey, loading, reminders]);
 
   function openCreate() {

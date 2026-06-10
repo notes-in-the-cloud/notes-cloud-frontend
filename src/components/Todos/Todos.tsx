@@ -159,6 +159,7 @@ export default function TodosPage({ onBack }: Props) {
     } catch (err) {
       console.error('Failed to create task:', err);
       setError('Could not create todo task.');
+      closeCreatePanel();
     } finally {
       setSavingTask(false);
     }

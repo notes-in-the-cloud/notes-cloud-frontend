@@ -115,21 +115,21 @@
 }
 
 .todo-priority--low {
-  background: var(--blueDim);
-  color: var(--blue);
-  border-color: var(--blue);
+  background: rgba(138, 133, 128, 0.15);
+  color: var(--textMuted);
+  border-color: var(--border);
 }
 
 .todo-priority--medium {
-  background: var(--amberDim);
-  color: var(--amber);
-  border-color: var(--amber);
+  background: var(--yellowDim);
+  color: var(--yellow);
+  border-color: var(--yellow);
 }
 
 .todo-priority--high {
-  background: var(--errorDim);
-  color: var(--error);
-  border-color: var(--error);
+  background: var(--highDim);
+  color: var(--high);
+  border-color: var(--high);
 }
 
 .todos-icon-btn {
