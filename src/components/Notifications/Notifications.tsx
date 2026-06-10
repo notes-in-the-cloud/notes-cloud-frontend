@@ -164,12 +164,8 @@ export default function NotificationsPanel({
                     {n.message && <div className="notif-body-sub">{n.message}</div>}
                     <div className="notif-body-meta">
                       <span>{formatTime(n.firedAt)}</span>
-                      {!n.read && (
-                        <>
-                          <span>-</span>
-                          <span className="notif-body-action">View notification</span>
-                        </>
-                      )}
+                      <span>-</span>
+                      <span className="notif-body-action">View notification</span>
                     </div>
                   </div>
                   {!n.read && <div className="notif-unread-dot" />}

@@ -21,9 +21,10 @@ import './Reminders.css';
 interface Props {
   onBack: () => void;
   openReminderId?: string;
+  openReminderRequestKey?: number;
 }
 
-export default function RemindersPage({ onBack, openReminderId }: Props) {
+export default function RemindersPage({ onBack, openReminderId, openReminderRequestKey = 0 }: Props) {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -70,16 +71,18 @@ useEffect(()=>{
   return ()=>window.removeEventListener('reminder:updated',onReminderUpdated);
 },[]);
 
-  const openedIds = useRef(new Set<string>());
+  const handledOpenRequestKey = useRef<number | null>(null);
   useEffect(() => {
     if (!openReminderId || loading) return;
-    if (openedIds.current.has(openReminderId)) return;
+    if (handledOpenRequestKey.current === openReminderRequestKey) return;
+
     const target = reminders.find(r => r.id === openReminderId);
+
     if (target) {
-      openedIds.current.add(openReminderId);
+      handledOpenRequestKey.current = openReminderRequestKey;
       openEdit(target);
     }
-  }, [openReminderId, loading, reminders]);
+  }, [openReminderId, openReminderRequestKey, loading, reminders]);
 
   function openCreate() {
     setEditingId(null);

@@ -11,6 +11,8 @@
   --accentDim: rgba(221, 142, 39, 0.12);
   --error: #ee1919;
   --errorDim: rgba(200, 80, 80, 0.12);
+  --high: #c2410c;
+  --highDim: rgba(194, 65, 12, 0.14);
   --success: #7CC87C;
   --successDim: rgba(80, 160, 80, 0.12);
   --blue: #7C9CC8;
@@ -32,6 +34,8 @@
   --textDim: #ffffff;
   --accentDim: rgba(201, 168, 124, 0.15);
   --errorDim: rgba(200, 124, 124, 0.15);
+  --high: #fb7185;
+  --highDim: rgba(251, 113, 133, 0.18);
   --successDim: rgba(124, 200, 124, 0.15);
   --blueDim: rgba(124, 156, 200, 0.15);
   --amberDim: rgba(232, 185, 124, 0.15);
