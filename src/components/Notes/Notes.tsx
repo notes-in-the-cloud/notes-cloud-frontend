@@ -21,6 +21,7 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openReminderId, setOpenReminderId] = useState<string | undefined>(undefined);
+  const [openReminderRequestKey, setOpenReminderRequestKey] = useState(0);
 
   const session = useMemo(() => loadSession(), []);
   const userId = session?.userId ?? null;
@@ -34,7 +35,9 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
   } = useNotifications(userId, showNotifications);
 
   function handleOpenReminder(reminderId: string) {
+    setShowTodos(false);
     setOpenReminderId(reminderId);
+    setOpenReminderRequestKey(key => key + 1);
     setShowReminders(true);
   }
 
@@ -79,7 +82,11 @@ export default function Notes({ onNavigate, darkMode, onToggleTheme }: Props) {
       {showTodos ? (
         <TodosPage onBack={handleBackFromTodos} />
       ) : showReminders ? (
-        <RemindersPage onBack={handleBackFromReminders} openReminderId={openReminderId} />
+        <RemindersPage
+          onBack={handleBackFromReminders}
+          openReminderId={openReminderId}
+          openReminderRequestKey={openReminderRequestKey}
+        />
       ) : (
         <main className="main-container">
           <NotesList />

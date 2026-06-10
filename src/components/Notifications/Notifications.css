@@ -288,7 +288,7 @@
 }
 
 .notif-priority--urgent { background: var(--errorDim); color: var(--error); }
-.notif-priority--high   { background: var(--amberDim); color: var(--amber); }
+.notif-priority--high   { background: var(--highDim); color: var(--high); }
 .notif-priority--medium { background: var(--yellowDim); color: var(--yellow); }
 .notif-priority--low    { background: rgba(138, 133, 128, 0.15); color: var(--textMuted); }
 

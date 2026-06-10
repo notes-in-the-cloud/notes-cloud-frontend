@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Notes Cloud">
+  <defs>
+    <linearGradient id="cloud" x1="13" y1="16" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2EA7FF"/>
+      <stop offset="1" stop-color="#0066E6"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="41" y1="17" x2="52" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF5FF"/>
+      <stop offset="1" stop-color="#B6DFFF"/>
+    </linearGradient>
+    <filter id="shadow" x="14" y="13" width="42" height="47" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#003C8F" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <path
+    fill="url(#cloud)"
+    d="M18.5 50.5C10.5 50.5 4 44.2 4 36.4c0-6.8 4.9-12.5 11.5-13.8C18.2 14.8 25.6 9.5 34 9.5c10 0 18.3 7.6 19.2 17.4C59.5 29.1 64 34.9 64 41.7c0 8.3-6.8 15-15.2 15H18.5z"
+  />
+  <path
+    fill="#1593F7"
+    opacity="0.45"
+    d="M11.7 44.8c0-7.3 6-13.3 13.4-13.3h17.5c5.7 0 10.6 3.5 12.5 8.5-1.1 6.3-6.7 11.1-13.4 11.1H18.5c-2.5 0-4.8-.6-6.8-1.7v-4.6z"
+  />
+
+  <g filter="url(#shadow)">
+    <path
+      fill="#fff"
+      d="M22 21.5c0-3 2.5-5.5 5.5-5.5H42l10 10v24.5c0 3-2.5 5.5-5.5 5.5h-19c-3 0-5.5-2.5-5.5-5.5v-29z"
+    />
+    <path fill="url(#fold)" d="M42 16v8.5c0 3 2.5 5.5 5.5 5.5H52L42 16z"/>
+    <rect x="29" y="31" width="18" height="3.2" rx="1.6" fill="#FACC15"/>
+    <rect x="29" y="39" width="18" height="3.2" rx="1.6" fill="#168BF2"/>
+    <rect x="29" y="47" width="18" height="3.2" rx="1.6" fill="#168BF2"/>
+  </g>
+</svg>
